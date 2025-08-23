@@ -21,3 +21,46 @@ model User {
   image     String?
   createdAt DateTime @default(now())
 }
+
+model Category {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String   
+  sparql    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt 
+
+  entries   Entry[]
+  difficulties  Difficulty[]
+}
+
+model Difficulty {
+  id        String  @id @default(cuid())
+  category  Category  @relation(fields: [categoryId], references: [id])
+  categoryId String
+
+  level Int
+}
+
+model Entry {
+  id         String   @id @default(cuid())
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+
+  label  String 
+  norm   String
+  url    String 
+
+  aliases Alias[]
+}
+
+model Alias {
+  id       String @id @default(cuid())
+  entry    Entry  @relation(fields: [entryId], references: [id])
+  entryId  String
+
+  label String
+  norm  String
+}
+
+
