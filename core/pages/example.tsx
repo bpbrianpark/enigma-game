@@ -10,14 +10,14 @@ export default function Page({ user }: Props) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const user = await prisma.user.findFirst({
         where: {
-            email: 'testt@test.com'
+            email: 'test@test.com'
         }
     })
     return {
         props: {
             user: {
                 ...user,
-                createdAt: user?.createdAt?.toISOString(), // convert Date → string
+                createdAt: user?.createdAt?.toISOString(), 
             },
         }
     }
