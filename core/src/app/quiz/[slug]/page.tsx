@@ -1,5 +1,5 @@
 import QuizGame from "@/app/components/QuizGame";
-import { Category, Entry } from "@prisma/client";
+import { Category, Difficulty, Entry } from "@prisma/client";
 import { notFound } from "next/navigation";
 
 // Cache is set to no-store because it will be a dynamic DB
@@ -17,7 +17,7 @@ async function getEntries(slug: string): Promise<Entry[]> {
   return data.entries;
 }
 
-async function getDifficulties(slug: string): Promise<Category> {
+async function getDifficulties(slug: string): Promise<Difficulty[]> {
     const res = await fetch(`http://localhost:3000/api/categories/${slug}/`, { 
         cache: "no-store"
     });
@@ -38,6 +38,7 @@ export default async function QuizPage({ params }: { params: Promise<{ slug: str
 
   return (
     <QuizGame 
+      difficulties={difficulties}
       entries={entries}
       totalEntries={entries.length}
       slug={slug}
