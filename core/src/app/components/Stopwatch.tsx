@@ -1,9 +1,11 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useImperativeHandle } from 'react';
 
 interface StopwatchProps {
   isRunning?: boolean;
+  shouldReset?: boolean;
+  onResetComplete?: () => void;
   onTimeUpdate?: (time: number) => void;
 }
 
@@ -15,10 +17,17 @@ function formatTime(milliseconds: number): string {
   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
-export default function Stopwatch({ isRunning = true, onTimeUpdate }: StopwatchProps) {
+export default function Stopwatch({ isRunning = true, shouldReset, onResetComplete, onTimeUpdate }: StopwatchProps) {
   const [time, setTime] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number>(Date.now());
+
+  useEffect(() => {
+    if (shouldReset) {
+      setTime(0);
+      onResetComplete?.();
+    }
+  }, [shouldReset])
 
   useEffect(() => {
     if (isRunning) {

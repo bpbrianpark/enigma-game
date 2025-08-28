@@ -5,6 +5,7 @@ import { Entry } from '@prisma/client';
 
 interface GuessInputProps {
   entries: Entry[];
+  isGameCompleted: boolean;
   onCorrectGuess: (entry: Entry) => void;
   onIncorrectGuess: (guess: string) => void;
 }
@@ -30,7 +31,7 @@ function checkGuess(guess: string, entryHashMap: Map<string, Entry>): Entry | nu
     return entryHashMap.get(normalizedGuess) || null;
 }
 
-export default function GuessInput({ entries, onCorrectGuess, onIncorrectGuess }: GuessInputProps) {
+export default function GuessInput({ entries, isGameCompleted, onCorrectGuess, onIncorrectGuess }: GuessInputProps) {
   const entryHashMap = useMemo(() => {
         return buildEntryHashMap(entries);
     }, [entries]);
@@ -65,6 +66,7 @@ export default function GuessInput({ entries, onCorrectGuess, onIncorrectGuess }
   return (
     <div className="guess-input-wrapper">
       <input
+        disabled={isGameCompleted}
         type="text"
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
@@ -73,6 +75,7 @@ export default function GuessInput({ entries, onCorrectGuess, onIncorrectGuess }
         className="guess-input"
       />
       <button 
+        disabled={isGameCompleted}
         onClick={handleSubmit}
         className="guess-button"
       >
