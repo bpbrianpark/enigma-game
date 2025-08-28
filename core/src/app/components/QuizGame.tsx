@@ -7,6 +7,7 @@ import Stopwatch from './Stopwatch';
 import { Difficulty, Entry } from '@prisma/client';
 import DifficultyPicker from './DifficultyPicker';
 import GiveUpButton from './GiveUpButton';
+import RestartButton from './RestartButton';
 
 interface QuizGameClientProps { 
     difficulties: Difficulty[]
@@ -22,13 +23,18 @@ export default function QuizGame({ difficulties, entries, totalEntries, slug }: 
     const [correctGuesses, setCorrectGuesses] = useState<Entry[]>([]);
     const [incorrectGuesses, setIncorrectGuesses] = useState<string[]>([]);
     const [finalTime, setFinalTime] = useState<number | null>(null);
-    const [completed, setCompleted] = useState(false);
+    const [givenUp, setGivenUp] = useState(false);
+    const [shouldReset, setShouldReset] = useState(false);
 
     const targetEntries = selectedDifficulty?.limit || totalEntries;
 
-    const isQuizCompleted = useMemo(() => {
+    const isTargetEntriesGuessed = useMemo(() => {
         return correctGuesses.length === targetEntries;
-    }, [correctGuesses.length, totalEntries])
+    }, [correctGuesses.length, targetEntries])
+
+    const isGameCompleted = useMemo(() => {
+        return (isTargetEntriesGuessed || givenUp)
+    }, [isTargetEntriesGuessed, givenUp])
 
     const handleCorrectGuess = useCallback((guess: Entry) => {
         if (correctGuesses.includes(guess)) {
@@ -40,14 +46,15 @@ export default function QuizGame({ difficulties, entries, totalEntries, slug }: 
 
     const handleDifficultyChange = useCallback((difficulty: Difficulty) => {
         setSelectedDifficulty(difficulty);
+        setGivenUp(false);
         setCorrectGuesses([]);
         setIncorrectGuesses([]);
         setFinalTime(null);
+        setShouldReset(true);
     }, []);
 
     const handleGiveUp = useCallback(() => {
-        console.log("Hath given up.")
-        setCompleted(true)
+        setGivenUp(true)
     }, [])
 
     const handleIncorrectGuess = useCallback((guess: string) => {
@@ -58,27 +65,43 @@ export default function QuizGame({ difficulties, entries, totalEntries, slug }: 
         setIncorrectGuesses(prev => [...prev, guess]);
     }, [incorrectGuesses]);
 
+    const handleRestart = useCallback(() => {
+        setGivenUp(false);
+        setCorrectGuesses([]);
+        setIncorrectGuesses([]);
+        setFinalTime(null);
+        setShouldReset(true);
+    }, []);
+
+    const handleStopwatchReset = useCallback(() => {
+        setShouldReset(false);
+    }, [])
+
     const handleStopwatchUpdate = useCallback((time: number) => {
-        if ((isQuizCompleted && finalTime === null) || completed) {
+        if ((isTargetEntriesGuessed && finalTime === null) || givenUp) {
             setFinalTime(time);
         }
-    }, [completed, isQuizCompleted, finalTime])
+    }, [givenUp, isTargetEntriesGuessed, finalTime])
 
     return (
         <div className="quiz-container">
         <div className="quiz-top-layer">
             <div className="stopwatch">
             <Stopwatch 
-            isRunning={!isQuizCompleted && !completed}
+            isRunning={!isGameCompleted}
+            shouldReset={shouldReset}
+            onResetComplete={handleStopwatchReset}
             onTimeUpdate={handleStopwatchUpdate}
             />
-            {isQuizCompleted && (
+            {isTargetEntriesGuessed && (
                 <div className="quiz-completed-message">
                     Quiz complete!
                 </div>
             )}
             </div>
-            <GiveUpButton onGiveUp={handleGiveUp}/>
+            <GiveUpButton disabled={givenUp} onGiveUp={handleGiveUp}/>
+            {isGameCompleted && 
+            <RestartButton onRestart={handleRestart}/>}
         </div>
 
         <div className="quiz-second-layer">
@@ -91,7 +114,7 @@ export default function QuizGame({ difficulties, entries, totalEntries, slug }: 
                     difficulties={difficulties}
                     selectedDifficulty={selectedDifficulty}
                     onDifficultyChange={handleDifficultyChange}
-                    disabled={isQuizCompleted}
+                    disabled={isTargetEntriesGuessed}
                 ></DifficultyPicker>
             <div className="text-sm text-gray-600">
                 {correctGuesses.length} / {targetEntries} correct
@@ -103,6 +126,7 @@ export default function QuizGame({ difficulties, entries, totalEntries, slug }: 
             <div className="input-guesser">
             <GuessInput 
                 entries={entries}
+                isGameCompleted={isGameCompleted}
                 onCorrectGuess={handleCorrectGuess}
                 onIncorrectGuess={handleIncorrectGuess}
             />
