@@ -27,6 +27,8 @@ model Category {
   slug      String   @unique
   name      String   
   sparql    String
+  isDynamic Boolean  @default(false)
+  updateSparql String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt 
 
@@ -51,8 +53,9 @@ model Entry {
   label  String 
   norm   String
   url    String 
-
   aliases Alias[]
+
+  @@index([categoryId, norm])
 }
 
 model Alias {
@@ -62,6 +65,21 @@ model Alias {
 
   label String
   norm  String
+
+  @@index([entryId, norm])
+}
+
+model Game {
+  id      String  @id @default(cuid())
+  userId  String
+  categoryId  String
+  difficultyId  String
+  time    Int
+
+  user  User  @relation(fields:[userId],references:[id], onDelete: Cascade)
+  category  Category  @relation(fields:[categoryId],references:[id], onDelete:Cascade)
+
+  @@index([categoryId, targetCount, time])
 }
 
 

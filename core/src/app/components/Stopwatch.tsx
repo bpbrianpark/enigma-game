@@ -1,0 +1,56 @@
+'use client'
+
+import { useState, useEffect, useRef } from 'react';
+
+interface StopwatchProps {
+  isRunning?: boolean;
+  onTimeUpdate?: (time: number) => void;
+}
+
+function formatTime(milliseconds: number): string {
+  const totalSeconds = Math.floor(milliseconds / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  
+  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+export default function Stopwatch({ isRunning = true, onTimeUpdate }: StopwatchProps) {
+  const [time, setTime] = useState(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number>(Date.now());
+
+  useEffect(() => {
+    if (isRunning) {
+      startTimeRef.current = Date.now() - time;
+      
+      intervalRef.current = setInterval(() => {
+        const currentTime = Date.now() - startTimeRef.current;
+        setTime(currentTime);
+        
+        if (onTimeUpdate) {
+          onTimeUpdate(currentTime);
+        }
+      }, 10); 
+    } else {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [isRunning, onTimeUpdate, time]);
+
+  return (
+    <div className="stopwatch-display">
+      <div className="stopwatch-time">
+        {formatTime(time)}
+      </div>
+    </div>
+  );
+}

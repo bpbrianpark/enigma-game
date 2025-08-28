@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "../../../../../lib/prisma";
 import { Category } from '@prisma/client'
 
+// Endpoint to retrieve everything about a category
 export async function GET(
   req: NextRequest,
   { params }: { params: { slug: string } }
