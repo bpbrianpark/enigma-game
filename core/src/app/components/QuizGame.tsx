@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import GuessInput from './GuessInput';
 import QuizTable from './QuizTable';
 import Stopwatch from './Stopwatch';
@@ -84,25 +84,50 @@ export default function QuizGame({ difficulties, entries, totalEntries, slug }: 
     }, [])
 
     const handleStopwatchUpdate = useCallback((time: number) => {
+        setFinalTime(time)
         if ((isTargetEntriesGuessed && finalTime === null) || givenUp) {
             setFinalTime(time);
+
+            if (isTargetEntriesGuessed) {
+                postGameData(time)
+            }
         }
     }, [givenUp, isTargetEntriesGuessed, finalTime])
 
-    // const postGameData = useCallback(() => {
-    //     if (!username) return;
+    const postGameData = useCallback(async (time?: number) => {
+        if (!username) return;
 
-    //     const gameData = {
-    //         username,
-    //         category: slug,
-    //         difficulty: selectedDifficulty
-    //         correctAnswers: correctGuesses.length
-    //         totalEntries: targetEntries
-    //         time: completionTime || finalTime
-    //         completed: isTargetEntriesGuessed
-    //         givenUp
-    //     }
-    // })
+        const gameData = {
+            username,
+            slug: slug,
+            difficultyId: selectedDifficulty?.id,
+            time: time,
+            targetCount: targetEntries
+        }
+
+        try {
+            const response = await fetch('http://localhost:3000/api/games', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(gameData),
+            });
+
+            if (!response.ok) {
+                console.error('Failed to save game data');
+                console.error(response)
+            }
+        } catch (e) {
+            console.log("Error posting game", e);
+        }
+    },[username, slug, selectedDifficulty, targetEntries]);
+
+    useEffect(() => {
+        if (isTargetEntriesGuessed && finalTime !== null && !givenUp && username && selectedDifficulty) {
+            postGameData(finalTime);
+        }
+    }, [isTargetEntriesGuessed, finalTime, givenUp, username, selectedDifficulty, postGameData]);
 
     if (!username) {
         return (

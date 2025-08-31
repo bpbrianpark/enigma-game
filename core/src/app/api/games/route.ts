@@ -45,16 +45,13 @@ export async function POST(req: NextRequest) {
         time,
         targetCount,
         username
-      },
-      include: {
-        user: true,
-        category: true,
-        difficulty: true
       }
     });
 
     return NextResponse.json(game, { status: 201 });
   } catch (e) {
-    console.log("Error uploading game ", e)
+    return NextResponse.json({
+      message: 'Could not post game.'
+    }, { status: 409 })
   }
 }
