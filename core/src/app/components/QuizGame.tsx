@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import GuessInput from './GuessInput';
 import QuizTable from './QuizTable';
 import Stopwatch from './Stopwatch';
@@ -8,6 +8,7 @@ import { Difficulty, Entry } from '@prisma/client';
 import DifficultyPicker from './DifficultyPicker';
 import GiveUpButton from './GiveUpButton';
 import RestartButton from './RestartButton';
+import RegisterDialog from './RegisterDialog';
 
 interface QuizGameClientProps { 
     difficulties: Difficulty[]
@@ -17,6 +18,7 @@ interface QuizGameClientProps {
 }
 
 export default function QuizGame({ difficulties, entries, totalEntries, slug }: QuizGameClientProps) {
+    const [username, setUsername] = useState<string | null>(null)
     const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty | null>(
         difficulties.length > 0 ? difficulties[0] : null
     );
@@ -35,6 +37,10 @@ export default function QuizGame({ difficulties, entries, totalEntries, slug }: 
     const isGameCompleted = useMemo(() => {
         return (isTargetEntriesGuessed || givenUp)
     }, [isTargetEntriesGuessed, givenUp])
+
+    const handleUsernameSubmit = useCallback((submittedUser: string) => {
+        setUsername(submittedUser)
+    }, [])
 
     const handleCorrectGuess = useCallback((guess: Entry) => {
         if (correctGuesses.includes(guess)) {
@@ -78,10 +84,58 @@ export default function QuizGame({ difficulties, entries, totalEntries, slug }: 
     }, [])
 
     const handleStopwatchUpdate = useCallback((time: number) => {
+        setFinalTime(time)
         if ((isTargetEntriesGuessed && finalTime === null) || givenUp) {
             setFinalTime(time);
+
+            if (isTargetEntriesGuessed) {
+                postGameData(time)
+            }
         }
     }, [givenUp, isTargetEntriesGuessed, finalTime])
+
+    const postGameData = useCallback(async (time?: number) => {
+        if (!username) return;
+
+        const gameData = {
+            username,
+            slug: slug,
+            difficultyId: selectedDifficulty?.id,
+            time: time,
+            targetCount: targetEntries
+        }
+
+        try {
+            const response = await fetch('http://localhost:3000/api/games', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(gameData),
+            });
+
+            if (!response.ok) {
+                console.error('Failed to save game data');
+                console.error(response)
+            }
+        } catch (e) {
+            console.log("Error posting game", e);
+        }
+    },[username, slug, selectedDifficulty, targetEntries]);
+
+    useEffect(() => {
+        if (isTargetEntriesGuessed && finalTime !== null && !givenUp && username && selectedDifficulty) {
+            postGameData(finalTime);
+        }
+    }, [isTargetEntriesGuessed, finalTime, givenUp, username, selectedDifficulty, postGameData]);
+
+    if (!username) {
+        return (
+            <RegisterDialog 
+            onUsernameSubmit={handleUsernameSubmit}
+            />
+        )
+    }
 
     return (
         <div className="quiz-container">

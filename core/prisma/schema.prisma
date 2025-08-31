@@ -15,11 +15,13 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  email     String   @unique
+  email     String  
   password  String
-  name      String?
+  username      String   @unique
   image     String?
   createdAt DateTime @default(now())
+
+  games     Game[]
 }
 
 model Category {
@@ -34,6 +36,7 @@ model Category {
 
   entries   Entry[]
   difficulties  Difficulty[]
+  games     Game[]
 }
 
 model Difficulty {
@@ -43,6 +46,8 @@ model Difficulty {
 
   level Int
   limit Int
+
+  games Game[]
 }
 
 model Entry {
@@ -71,15 +76,17 @@ model Alias {
 
 model Game {
   id      String  @id @default(cuid())
-  userId  String
-  categoryId  String
+  username  String
+  slug  String
   difficultyId  String
   time    Int
+  targetCount Int
 
-  user  User  @relation(fields:[userId],references:[id], onDelete: Cascade)
-  category  Category  @relation(fields:[categoryId],references:[id], onDelete:Cascade)
+  user  User  @relation(fields:[username],references:[username], onDelete: Cascade)
+  category  Category  @relation(fields:[slug],references:[slug], onDelete:Cascade)
+  difficulty Difficulty @relation(fields: [difficultyId], references: [id], onDelete: Cascade)
 
-  @@index([categoryId, targetCount, time])
+  @@index([slug, targetCount, time])
 }
 
 
