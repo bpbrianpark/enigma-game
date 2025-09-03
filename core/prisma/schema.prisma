@@ -57,7 +57,7 @@ model Entry {
 
   label  String 
   norm   String
-  url    String 
+  url    String @unique
   aliases Alias[]
 
   @@index([categoryId, norm])

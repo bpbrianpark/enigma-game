@@ -4,20 +4,22 @@ import { useState, useCallback, useMemo, useEffect } from 'react';
 import GuessInput from './GuessInput';
 import QuizTable from './QuizTable';
 import Stopwatch from './Stopwatch';
-import { Difficulty, Entry } from '@prisma/client';
+import { Category, Difficulty, Entry } from '@prisma/client';
 import DifficultyPicker from './DifficultyPicker';
 import GiveUpButton from './GiveUpButton';
 import RestartButton from './RestartButton';
 import RegisterDialog from './RegisterDialog';
 
 interface QuizGameClientProps { 
+    category: Category;
     difficulties: Difficulty[]
     entries: Entry[];
     totalEntries: number; 
     slug: string;
+    isDynamic: boolean;
 }
 
-export default function QuizGame({ difficulties, entries, totalEntries, slug }: QuizGameClientProps) {
+export default function QuizGame({ category, difficulties, entries, totalEntries, slug, isDynamic }: QuizGameClientProps) {
     const [username, setUsername] = useState<string | null>(null)
     const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty | null>(
         difficulties.length > 0 ? difficulties[0] : null
@@ -178,12 +180,16 @@ export default function QuizGame({ difficulties, entries, totalEntries, slug }: 
 
         <div className="quiz-third-layer">
             <div className="input-guesser">
+                {category &&
             <GuessInput 
+                category={category}
                 entries={entries}
+                isDynamic={isDynamic}
                 isGameCompleted={isGameCompleted}
                 onCorrectGuess={handleCorrectGuess}
                 onIncorrectGuess={handleIncorrectGuess}
             />
+                }
             </div>
         </div>
 
