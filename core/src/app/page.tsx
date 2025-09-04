@@ -1,26 +1,22 @@
-import { getServerSession } from "next-auth";
 import { prisma } from "../../lib/prisma";
-import { authOptions } from "./api/auth/[...nextauth]/route";
-import { User } from "./user";
-import { LoginButton, LogOutButton } from "./auth";
+import CategoryButton from "./components/CategoryButton";
 
 export default async function Home() {
-  const session = await getServerSession(authOptions)
-
-  const user = await prisma.user.findFirst({
-    where: {
-      email: 'test@test.com'
-    }
-  })
+  const categories = await prisma.category.findMany();
 
   return (
     <main>
-      <LoginButton></LoginButton>
-      <LogOutButton></LogOutButton>
-      <h2>Server Session</h2>
-      <pre>{JSON.stringify(session)}</pre>
-      <h2>Client Call</h2>
-      <User></User>
+      <h2> Hey there. Welcome to the game. </h2>
+      <div className="category-link-grid">
+        {categories.map((category) => (
+          <CategoryButton
+            key={category.id}
+            slug={category.slug}
+            name={category.name}
+            imageUrl={'public/globe.svg'} 
+          />
+        ))}
+      </div>
     </main>
   );
 }

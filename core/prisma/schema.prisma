@@ -29,6 +29,7 @@ model Category {
   slug      String   @unique
   name      String   
   sparql    String
+  imageUrl String?
   isDynamic Boolean  @default(false)
   updateSparql String?
   createdAt DateTime @default(now())
