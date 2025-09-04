@@ -17,7 +17,6 @@ export default async function Home() {
     <main>
       <LoginButton></LoginButton>
       <LogOutButton></LogOutButton>
-      <div>Hello, {user?.name}</div>
       <h2>Server Session</h2>
       <pre>{JSON.stringify(session)}</pre>
       <h2>Client Call</h2>

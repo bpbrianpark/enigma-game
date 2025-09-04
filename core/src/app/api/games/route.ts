@@ -6,23 +6,32 @@ import { NextRequest, NextResponse } from "next/server";
 // Endpoint to retrieve all the games (for the leaderboard)
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const slug = searchParams.get('slug');
-  const difficultyId = searchParams.get('difficultyId');
+  const slug = searchParams.get("slug");
+  const difficultyId = searchParams.get("difficultyId");
 
   if (!slug || !difficultyId) {
-    return NextResponse.json({ error: "Games not found for category or difficulty." }, { status: 404 });
+    return NextResponse.json(
+      { error: "Games not found for category or difficulty." },
+      { status: 404 }
+    );
   }
-    
-  const game = await prisma.game.findMany({
-    where: { slug: slug,
-        difficultyId: difficultyId }
+
+  const games = await prisma.game.findMany({
+    where: {
+      slug,
+      difficultyId,
+    },
+    orderBy: {
+      time: "asc", 
+    },
+    take: 25, 
   });
 
-  if (!game) {
+  if (!games || games.length === 0) {
     return NextResponse.json({ error: "Games not found" }, { status: 404 });
   }
 
-  return NextResponse.json(game);
+  return NextResponse.json(games);
 }
 
 // Endpoint to put the game inside the database after completion
