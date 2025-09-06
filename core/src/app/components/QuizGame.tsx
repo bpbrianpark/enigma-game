@@ -13,6 +13,8 @@ import RegisterDialog from './RegisterDialog';
 import Link from "next/link";
 import { DifficultyType, EntryType, QuizGameClientPropsType } from "./types";
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
 export default function QuizGame({ category, difficulties, entries, totalEntries, slug, isDynamic }: QuizGameClientPropsType) {
     const [username, setUsername] = useState<string | null>(null)
     const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyType | null>(
@@ -102,7 +104,7 @@ export default function QuizGame({ category, difficulties, entries, totalEntries
         }
 
         try {
-            const response = await fetch('/api/games', {
+            const response = await fetch(`${baseUrl}/api/games`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

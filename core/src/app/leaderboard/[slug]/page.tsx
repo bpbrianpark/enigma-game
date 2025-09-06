@@ -5,9 +5,9 @@ import { Category, Difficulty, Game } from "@prisma/client";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
-
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 async function getCategory(slug: string): Promise<Category> {
-  const res = await fetch(`/api/categories/${slug}`, {
+  const res = await fetch(`${baseUrl}/api/categories/${slug}`, {
     cache: "no-store",
   });
 
@@ -20,7 +20,7 @@ async function getCategory(slug: string): Promise<Category> {
 }
 
 async function getGames(slug: string, difficultyId: string): Promise<Game[]> {
-  const url = new URL(`/api/games`);
+  const url = new URL(`${baseUrl}/api/games`);
   url.searchParams.set("slug", slug);
   url.searchParams.set("difficultyId", difficultyId);
 
@@ -37,7 +37,7 @@ async function getGames(slug: string, difficultyId: string): Promise<Game[]> {
 }
 
 async function getDifficulties(slug: string): Promise<Difficulty[]> {
-  const res = await fetch(`/api/categories/${slug}/`, {
+  const res = await fetch(`${baseUrl}/api/categories/${slug}/`, {
     cache: "no-store",
   });
 

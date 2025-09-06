@@ -7,6 +7,8 @@ interface RegisterDialogProps {
     onUsernameSubmit: (username: string) => void;
 }
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
 export default function RegisterDialog({ onUsernameSubmit }: RegisterDialogProps) {
     const [username, setUsername] = useState('');
     const [error, setError] = useState<string | null>(null);
@@ -23,7 +25,7 @@ export default function RegisterDialog({ onUsernameSubmit }: RegisterDialogProps
         setError(null);
 
         try {
-            const response = await fetch('/api/users', {
+            const response = await fetch(`${baseUrl}/api/users`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: username.trim() }),

@@ -5,6 +5,7 @@ import './leaderboard.css'
 import { useCallback, useEffect, useState } from "react";
 import DifficultyPicker from "./DifficultyPicker";
 import { DifficultyType, GameType, LeaderboardPropsType } from './types';
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 function formatTime(milliseconds: number): string {
     const totalSeconds = Math.floor(milliseconds / 1000);
@@ -22,7 +23,7 @@ export default function Leaderboard({ category, difficulties, initialGames, slug
     const [games, setGames] = useState<GameType[]>(initialGames);
 
     const fetchGames = useCallback(async (difficultyId: string) => {
-        const url = new URL(`/api/games`);
+        const url = new URL(`${baseUrl}/api/games`);
         url.searchParams.set("slug", slug);
         url.searchParams.set("difficultyId", difficultyId);
 

@@ -5,9 +5,10 @@ import { Category, Difficulty, Entry } from "@prisma/client";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 async function getCategory(slug: string): Promise<Category> {
-  const res = await fetch(`/api/categories/${slug}`, {
+  const res = await fetch(`${baseUrl}/api/categories/${slug}`, {
     cache: "no-store",
   });
 
@@ -22,7 +23,7 @@ async function getCategory(slug: string): Promise<Category> {
 
 // Cache is set to no-store because it will be a dynamic DB
 async function getEntries(slug: string): Promise<Entry[]> {
-  const res = await fetch(`/api/categories/${slug}/entries`, {
+  const res = await fetch(`${baseUrl}/api/categories/${slug}/entries`, {
     cache: "no-store",
   });
 
@@ -36,7 +37,7 @@ async function getEntries(slug: string): Promise<Entry[]> {
 }
 
 async function getDifficulties(slug: string): Promise<Difficulty[]> {
-    const res = await fetch(`/api/categories/${slug}/`, { 
+    const res = await fetch(`${baseUrl}/api/categories/${slug}/`, { 
         cache: "no-store"
     });
 
