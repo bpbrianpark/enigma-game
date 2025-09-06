@@ -1,6 +1,8 @@
 import { prisma } from "../../../lib/prisma";
 import CategoryButton from "./CategoryButton";
 
+export const dynamic = "force-dynamic";
+
 export default async function CategoryList() {
   const categories = await prisma.category.findMany();
   return (
