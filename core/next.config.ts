@@ -2,6 +2,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
+    turbo: false,
     serverComponentsExternalPackages: ['@prisma/client', 'prisma']
   },
   webpack: (config, { isServer }) => {
