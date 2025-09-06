@@ -1,0 +1,23 @@
+body {
+    background-color: #DEDBDB;
+    margin: 0;
+    padding: 20px;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.category-link-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    grid-template-rows: repeat(2, 1fr);   
+    gap: 20px; 
+    width: 100%;
+    padding: 20px;
+}
+
+.category-link-grid a {
+    text-decoration: none;
+}

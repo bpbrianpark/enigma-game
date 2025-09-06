@@ -1,0 +1,23 @@
+.guess-input {
+    min-width: 350px;
+    max-width: 40%;  
+    height: 100%; 
+    border-radius: 4px; 
+    border: 1px solid #ccc;
+    padding: 4px;
+    background: #fff;
+    outline: none;
+    transition: background-color 0.6s ease, border-color 0.001s ease;
+    font-size: 16px;
+    text-align: left;
+}
+
+.guess-input.error-fade {
+    background-color: #f8d7da;
+    border-color: #dc3545;
+}
+
+.guess-input.correct-fade {
+    background-color: #d7f8dc;
+    border-color: #35dca4;
+}

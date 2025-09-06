@@ -4,28 +4,33 @@ import { hash } from 'bcrypt'
 const prisma = new PrismaClient()
 
 async function main() {
-    const password = await hash('test', 12)
-    const user = await prisma.user.upsert({
-        where: { email: 'test@test.com '},
-        update: {},
-        create: {
-            email: 'test@test.com',
-            username: 'Test User',
-            password
-        }
-    })
-    console.log({ user })
-
     const categories = [
         {
             slug: "humans-women",
-            name: "Women",
-            sparql: "SELECT DISTINCT ?item ?item_label WHERE { ?item wdt:P31 wd:Q5; wdt:P21 wd:Q6581072; rdfs:label ?item_label; FILTER(LANG(?item_label) = 'en')} LIMIT 5",
+            name: "Real-Life Women",
+            sparql: "SELECT DISTINCT ?item ?item_label WHERE { ?item wdt:P31 wd:Q5; wdt:P21 wd:Q6581072; rdfs:label ?item_label; FILTER(LANG(?item_label) = 'en')} LIMIT 1000",
             difficulties: [
                 { level: 1, limit: 10 },
-                { level: 2, limit: 20 },
-                { level: 3, limit: 30 }
-            ]
+                { level: 2, limit: 50 },
+                { level: 3, limit: 100 }
+            ],
+            isDynamic: true,
+            updateSparql:  `SELECT ?item ?itemLabel WHERE {
+  VALUES ?search { "SEARCH_TERM" }
+
+  SERVICE wikibase:mwapi {
+    bd:serviceParam wikibase:endpoint "www.wikidata.org";
+                     wikibase:api "EntitySearch";
+                     mwapi:search ?search;
+                     mwapi:language "en".
+    ?item wikibase:apiOutputItem mwapi:item.
+  }
+
+  ?item wdt:P31 wd:Q5;          
+        wdt:P21 wd:Q6581072.    
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}`
         },
         {
             slug: "pokemon_gen1",
@@ -36,7 +41,96 @@ async function main() {
                 { level: 2, limit: 50 },
                 { level: 3, limit: 151 }
             ]
-        }
+        },
+        {
+            slug: "humans_men",
+            name: "Real-Life Men",
+            sparql: "SELECT DISTINCT ?item ?item_label WHERE { ?item wdt:P31 wd:Q5; wdt:P21 wd:Q6581097; rdfs:label ?item_label; FILTER(LANG(?item_label) = 'en')} LIMIT 1000",
+            difficulties: [
+                { level: 1, limit: 10 },
+                { level: 2, limit: 50 },
+                { level: 3, limit: 100 }
+            ],
+            isDynamic: true,
+            updateSparql:  `SELECT ?item ?itemLabel WHERE {
+  VALUES ?search { "SEARCH_TERM" }
+
+  SERVICE wikibase:mwapi {
+    bd:serviceParam wikibase:endpoint "www.wikidata.org";
+                     wikibase:api "EntitySearch";
+                     mwapi:search ?search;
+                     mwapi:language "en".
+    ?item wikibase:apiOutputItem mwapi:item.
+  }
+
+  ?item wdt:P31 wd:Q5;          
+        wdt:P21 wd:Q6581097.    
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}`
+        },
+        {
+            slug: "nba_players",
+            name: "NBA Players",
+            sparql: `SELECT DISTINCT ?item ?item_label WHERE {
+  ?item wdt:P106 wd:Q3665646;
+    wdt:P118 wd:Q155223;
+    rdfs:label ?item_label.
+  FILTER((LANG(?item_label)) = "en")
+}`,
+            difficulties: [
+                { level: 1, limit: 10 },
+                { level: 2, limit: 50 },
+                { level: 3, limit: 100 },
+                { level: 4, limit: 200 },
+                { level: 5, limit: 500 }
+            ]
+        },
+        {
+            slug: "disease",
+            name: "Diseases",
+            sparql: `SELECT DISTINCT ?item ?item_label WHERE {
+  ?item wdt:P31 wd:Q12136;
+    rdfs:label ?item_label.
+  FILTER((LANG(?item_label)) = "en")
+}`,
+            difficulties: [
+                { level: 1, limit: 10 },
+                { level: 2, limit: 50 },
+                { level: 3, limit: 100 }
+            ]
+        },
+        {
+            slug: "tv_series",
+            name: "Television Series",
+            sparql: `SELECT DISTINCT ?item ?item_label WHERE {
+  ?item wdt:P31 wd:Q5398426;
+    rdfs:label ?item_label.
+  FILTER((LANG(?item_label)) = "en")
+}
+LIMIT 1000`,
+            difficulties: [
+                { level: 1, limit: 10 },
+                { level: 2, limit: 50 },
+                { level: 3, limit: 100 }
+            ],
+            isDynamic: true,
+            updateSparql:  `SELECT ?item ?itemLabel WHERE {
+  VALUES ?search { "SEARCH_TERM" }
+
+  SERVICE wikibase:mwapi {
+    bd:serviceParam wikibase:endpoint "www.wikidata.org";
+                     wikibase:api "EntitySearch";
+                     mwapi:search ?search;
+                     mwapi:language "en".
+    ?item wikibase:apiOutputItem mwapi:item.
+  }
+
+  ?item wdt:P31 wd:Q5398426;           
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}`
+        },
     ];
 
     for (const cat of categories) {

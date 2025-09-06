@@ -1,5 +1,7 @@
 'use client'
 
+import "./button.css";
+
 import { useCallback, useMemo, useState } from 'react';
 
 interface GuessInputProps {
@@ -23,7 +25,7 @@ export default function GiveUpButton({ onGiveUp, disabled = false }: GuessInputP
         disabled={disabled}
         className="give-up-button"
       >
-        Give up
+        Give Up
       </button>
     </div>
   );

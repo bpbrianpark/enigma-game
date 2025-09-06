@@ -3,7 +3,7 @@ import { Category, Difficulty, Game } from "@prisma/client";
 import { notFound } from "next/navigation";
 
 async function getCategory(slug: string): Promise<Category> {
-  const res = await fetch(`http://localhost:3000/api/categories/${slug}`, {
+  const res = await fetch(`/api/categories/${slug}`, {
     cache: "no-store",
   });
 
@@ -16,7 +16,7 @@ async function getCategory(slug: string): Promise<Category> {
 }
 
 async function getGames(slug: string, difficultyId: string): Promise<Game[]> {
-  const url = new URL(`http://localhost:3000/api/games`);
+  const url = new URL(`/api/games`);
   url.searchParams.set("slug", slug);
   url.searchParams.set("difficultyId", difficultyId);
 
@@ -33,7 +33,7 @@ async function getGames(slug: string, difficultyId: string): Promise<Game[]> {
 }
 
 async function getDifficulties(slug: string): Promise<Difficulty[]> {
-  const res = await fetch(`http://localhost:3000/api/categories/${slug}/`, {
+  const res = await fetch(`/api/categories/${slug}/`, {
     cache: "no-store",
   });
 

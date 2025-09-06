@@ -1,5 +1,6 @@
 'use client'
 
+import "./register-dialog.css";
 import { useState } from 'react';
 
 interface RegisterDialogProps {
@@ -9,12 +10,14 @@ interface RegisterDialogProps {
 export default function RegisterDialog({ onUsernameSubmit }: RegisterDialogProps) {
     const [username, setUsername] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const [showErrorEffect, setShowErrorEffect] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
         if (!username.trim()) {
             setError('Username is required');
+            triggerErrorEffect();
             return;
         }
         setError(null);
@@ -22,9 +25,7 @@ export default function RegisterDialog({ onUsernameSubmit }: RegisterDialogProps
         try {
             const response = await fetch('/api/users', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: username.trim() }),
             });
 
@@ -33,8 +34,10 @@ export default function RegisterDialog({ onUsernameSubmit }: RegisterDialogProps
             if (!response.ok) {
                 if (response.status === 409) {
                     setError('Username is already taken. Please choose another one.');
+                    triggerErrorEffect();
                 } else {
                     setError('Failed to create user');
+                    triggerErrorEffect();
                 }
                 return;
             }
@@ -43,41 +46,38 @@ export default function RegisterDialog({ onUsernameSubmit }: RegisterDialogProps
                 onUsernameSubmit(username.trim());
             } else {
                 setError('Username is already taken. Please choose another one.');
+                triggerErrorEffect();
             }
-        } catch (e) {
+        } catch {
             setError('Network error. Please try again.');
+            triggerErrorEffect();
         } 
     };
 
-    return (
-        <div className="register-dialog">
-            <form onSubmit={handleSubmit} className="register-input-">
-                <div>
-                    <h1>
-                        Username
-                    </h1>
-                    <input
-                        type="text"
-                        id="username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        placeholder="Enter your username"
-                        className="register-input"
-                        autoFocus
-                    />
-                    {error && (
-                        <p className="input-error">{error}</p>
-                    )}
-                </div>
+    const triggerErrorEffect = () => {
+        setShowErrorEffect(true);
+        setTimeout(() => setShowErrorEffect(false), 400); 
+    };
 
-                <button
-                    type="submit"
-                    disabled={!username.trim()}
-                    className="start-button"
-                >
-                    {'Start'}
-                </button>
+    return (
+        <div className="register-overlay">
+        <div className="register-dialog">
+            <form onSubmit={handleSubmit}>
+                <span className="enter-username-text">Enter Username</span>
+                <input
+                    type="text"
+                    id="username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Enter your username..."
+                    className={`register-input ${showErrorEffect ? 'error-fade' : ''}`}
+                    autoFocus
+                />
+                <p className={`input-error ${!error ? 'empty' : ''}`}>
+                    {error ?? 'placeholder'}
+                </p>
             </form>
+        </div>
         </div>
     );
 }

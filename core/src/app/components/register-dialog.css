@@ -1,0 +1,75 @@
+.register-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.2); 
+    backdrop-filter: blur(5px);  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.register-dialog {
+    width: 500px; 
+    height: 30%; 
+    border-radius: 10px; 
+    background: #c6c6c6;
+    position: absolute; 
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;   
+    justify-content: center; 
+    gap: 10px; 
+    width: 100%;
+    height: 100%;
+    text-align: center;   
+}
+
+.enter-username-text {
+    font-size: 24px; 
+    color: #000;
+}
+
+.register-input {
+    width: 70%;  
+    height: 28px; 
+    border-radius: 4px; 
+    border: 1px solid #ccc;
+    padding: 4px;
+    background: #fff;
+    outline: none;
+    transition: background-color 0.6s ease, border-color 0.001s ease;
+    font-size: 16px;
+    text-align: left;
+}
+
+.register-input.error-fade {
+    background-color: #f8d7da;
+    border-color: #dc3545;
+}
+
+.input-error {
+    font-size: 14px; 
+    color: #dc3545;
+    min-height: 16px;   
+    margin: 0;          
+    line-height: 16px;  
+    text-align: center; 
+    visibility: visible;
+}
+
+.input-error.empty {
+    visibility: hidden; 
+}
+

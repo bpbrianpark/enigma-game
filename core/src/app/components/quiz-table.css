@@ -1,0 +1,74 @@
+.quiz-table {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    min-height: 100%;
+    max-height: fit-content;
+    justify-content: center;
+}
+
+.guesses-column {
+    display: flex; 
+    flex-direction: column; 
+    justify-content: flex-start; 
+    align-items: center; 
+    width: 50%;
+    position: relative; 
+}
+
+.correct-guesses-header {
+    width: 80%; 
+    height: 30px; 
+    border-radius: 4px; 
+    background: #91aea1;
+    font-size: 16px;
+    text-align: center;
+    color: #fff;
+    display: flex;              
+    justify-content: center;   
+    align-items: center;        
+}
+
+.guesses {
+    width: 80%;
+    max-height: fit-content;
+}
+
+.guess-list {
+    min-height: 100%;
+    max-height: fit-content;
+    border-radius: 4px; 
+    background: #fff;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.incorrect-guess,
+.correct-guess {
+    color: #000;
+    margin-top: 4px;
+    margin-bottom: 6px; 
+}
+
+.incorrect-guess:last-child,
+.correct-guess:last-child {
+    margin-bottom: 0; 
+}
+
+.incorrect-guess-text,
+.correct-guess-text {
+    padding: 10px;
+}
+
+.incorrect-guesses-header {
+    width: 80%;
+    height: 30px;
+    border-radius: 4px;
+    background: #c08888;
+    font-size: 16px;
+    text-align: center;
+    color: #fff;
+    display: flex;              
+    justify-content: center;   
+    align-items: center;  
+}

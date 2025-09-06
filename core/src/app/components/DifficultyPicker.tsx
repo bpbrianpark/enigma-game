@@ -1,5 +1,6 @@
 'use client'
 
+import './difficulty-picker.css'
 import { Difficulty } from '@prisma/client';
 
 interface DifficultyPickerProps {
@@ -7,6 +8,21 @@ interface DifficultyPickerProps {
   selectedDifficulty: Difficulty | null;
   onDifficultyChange: (difficulty: Difficulty) => void;
   disabled?: boolean;
+}
+
+function getDifficultyLabel(level: number): string {
+  switch (level) {
+    case 1:
+      return 'Easy';
+    case 2:
+      return 'Medium';
+    case 3:
+      return 'Hard';
+    case 4:
+        return 'Extreme';
+    default:
+      return `Level ${level}`;
+  }
 }
 
 export default function DifficultyPicker({ 
@@ -19,9 +35,6 @@ export default function DifficultyPicker({
 
     return (
         <div className="difficulty-picker">
-            <div className="difficulty-label">
-                <span className="difficulty-text">Difficulty:</span>
-            </div>
         
             <div className="difficulty-options">
                 {sortedDifficulties.map((difficulty) => (
@@ -38,8 +51,7 @@ export default function DifficultyPicker({
                     ${disabled ? 'disabled' : ''}
                     `}
                     >
-                        <span className="difficulty-level">Level {difficulty.level}</span>
-                        <span className="difficulty-limit">({difficulty.limit} items)</span>
+                        <span className="difficulty-level">{getDifficultyLabel(difficulty.level)}</span>
                     </button>
                 ))}
             </div>

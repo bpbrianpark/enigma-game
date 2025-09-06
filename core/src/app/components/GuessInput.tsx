@@ -1,5 +1,7 @@
 'use client'
 
+import './guess-input.css'
+
 import { useCallback, useMemo, useState } from 'react';
 import { Category, Entry } from '@prisma/client';
 import { queryWDQS } from '../../../lib/wdqs';
@@ -55,7 +57,7 @@ async function checkAndInsertDynamic(
   if (!label || !url) return null;
 
   try {
-    const res = await fetch(`http://localhost:3000/api/categories/${category.slug}/entries`, {
+    const res = await fetch(`/api/categories/${category.slug}/entries`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -103,6 +105,21 @@ export default function GuessInput({ category, entries, isDynamic, isGameComplet
         return buildEntryHashMap(entries);
     }, [entries]);
   const [inputValue, setInputValue] = useState('');
+  const [showCorrectEffect, setShowCorrectEffect] = useState(false);
+  const [showErrorEffect, setShowErrorEffect] = useState(false);
+
+  
+  const triggerCorrectEffect = () => {
+      setShowCorrectEffect(true);
+      setTimeout(() => setShowCorrectEffect(false), 400); 
+  };
+
+
+  const triggerErrorEffect = () => {
+      setShowErrorEffect(true);
+      setTimeout(() => setShowErrorEffect(false), 400); 
+  };
+
 
   const handleSubmit = useCallback(async (e?: React.FormEvent) => {
         if (e) {
@@ -119,11 +136,14 @@ export default function GuessInput({ category, entries, isDynamic, isGameComplet
             console.log("Correct Entry! :", correctEntry)
             onCorrectGuess(correctEntry);
             setInputValue('');
+            triggerCorrectEffect();
         } else {
             console.log("Incorrect Entry: ", inputValue)
             onIncorrectGuess(inputValue.trim());
             setInputValue('');
+            triggerErrorEffect();
         }
+
     }, [inputValue, entryHashMap, onCorrectGuess, onIncorrectGuess]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -133,7 +153,6 @@ export default function GuessInput({ category, entries, isDynamic, isGameComplet
   };
 
   return (
-    <div className="guess-input-wrapper">
       <input
         disabled={isGameCompleted}
         type="text"
@@ -141,15 +160,7 @@ export default function GuessInput({ category, entries, isDynamic, isGameComplet
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyPress}
         placeholder="Enter your guess..."
-        className="guess-input"
+        className={`guess-input ${showErrorEffect ? 'error-fade' : ''} ${showCorrectEffect ? 'correct-fade' : ''}`}
       />
-      <button 
-        disabled={isGameCompleted}
-        onClick={handleSubmit}
-        className="guess-button"
-      >
-        Guess
-      </button>
-    </div>
   );
 }

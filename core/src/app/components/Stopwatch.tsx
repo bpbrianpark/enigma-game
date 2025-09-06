@@ -1,5 +1,7 @@
 'use client'
 
+import "./stopwatch.css";
+
 import { useState, useEffect, useRef, useImperativeHandle } from 'react';
 
 interface StopwatchProps {
@@ -11,10 +13,11 @@ interface StopwatchProps {
 
 function formatTime(milliseconds: number): string {
   const totalSeconds = Math.floor(milliseconds / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
   
-  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
 export default function Stopwatch({ isRunning = true, shouldReset, onResetComplete, onTimeUpdate }: StopwatchProps) {
@@ -56,10 +59,8 @@ export default function Stopwatch({ isRunning = true, shouldReset, onResetComple
   }, [isRunning, onTimeUpdate, time]);
 
   return (
-    <div className="stopwatch-display">
       <div className="stopwatch-time">
         {formatTime(time)}
       </div>
-    </div>
   );
 }

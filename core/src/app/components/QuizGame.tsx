@@ -1,5 +1,7 @@
 'use client'
 
+import "./quiz-game.css";
+
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import GuessInput from './GuessInput';
 import QuizTable from './QuizTable';
@@ -9,6 +11,7 @@ import DifficultyPicker from './DifficultyPicker';
 import GiveUpButton from './GiveUpButton';
 import RestartButton from './RestartButton';
 import RegisterDialog from './RegisterDialog';
+import Link from "next/link";
 
 interface QuizGameClientProps { 
     category: Category;
@@ -108,7 +111,7 @@ export default function QuizGame({ category, difficulties, entries, totalEntries
         }
 
         try {
-            const response = await fetch('http://localhost:3000/api/games', {
+            const response = await fetch('/api/games', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -131,55 +134,34 @@ export default function QuizGame({ category, difficulties, entries, totalEntries
         }
     }, [isTargetEntriesGuessed, finalTime, givenUp, username, selectedDifficulty, postGameData]);
 
-    if (!username) {
-        return (
-            <RegisterDialog 
-            onUsernameSubmit={handleUsernameSubmit}
-            />
-        )
-    }
-
     return (
         <div className="quiz-container">
+            {!username &&  <RegisterDialog 
+            onUsernameSubmit={handleUsernameSubmit}
+            /> }
         <div className="quiz-top-layer">
-            <div className="stopwatch">
+            <div className="category-name">
+            {category.name}
+            </div>
             <Stopwatch 
-            isRunning={!isGameCompleted}
+            isRunning={!isGameCompleted && (username != null)}
             shouldReset={shouldReset}
             onResetComplete={handleStopwatchReset}
             onTimeUpdate={handleStopwatchUpdate}
             />
-            {isTargetEntriesGuessed && (
-                <div className="quiz-completed-message">
-                    Quiz complete!
-                </div>
-            )}
-            </div>
+
+            <div className="give-up-restart-button-container">
             <GiveUpButton disabled={givenUp} onGiveUp={handleGiveUp}/>
-            {isGameCompleted && 
-            <RestartButton onRestart={handleRestart}/>}
+                        {isTargetEntriesGuessed && (
+                <Link href={`/leaderboard/${slug}`} className="quiz-completed-message">
+                    Leaderboards
+                </Link>
+            )}
+            <RestartButton disabled={!isGameCompleted} onRestart={handleRestart}/>
+            </div>
         </div>
 
         <div className="quiz-second-layer">
-            <div className="category-name">
-            {slug.replace('-', ' ').toUpperCase()}
-            </div>
-
-            <div className="difficulty-picker">
-                <DifficultyPicker
-                    difficulties={difficulties}
-                    selectedDifficulty={selectedDifficulty}
-                    onDifficultyChange={handleDifficultyChange}
-                    disabled={isTargetEntriesGuessed}
-                ></DifficultyPicker>
-            <div className="text-sm text-gray-600">
-                {correctGuesses.length} / {targetEntries} correct
-            </div>
-            </div>
-        </div>
-
-        <div className="quiz-third-layer">
-            <div className="input-guesser">
                 {category &&
             <GuessInput 
                 category={category}
@@ -190,7 +172,21 @@ export default function QuizGame({ category, difficulties, entries, totalEntries
                 onIncorrectGuess={handleIncorrectGuess}
             />
                 }
+            <div className="progress-text">
+                {correctGuesses.length} / {targetEntries}
             </div>
+        </div>
+
+        <div className="quiz-third-layer">
+            <div className="difficulty-picker">
+                <DifficultyPicker
+                    difficulties={difficulties}
+                    selectedDifficulty={selectedDifficulty}
+                    onDifficultyChange={handleDifficultyChange}
+                    disabled={isTargetEntriesGuessed}
+                ></DifficultyPicker>
+            </div>
+
         </div>
 
         <QuizTable 

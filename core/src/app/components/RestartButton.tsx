@@ -1,5 +1,7 @@
 'use client'
 
+import './button.css'
+
 import { useCallback, useMemo, useState } from 'react';
 
 interface RestartButtonProps {

@@ -1,0 +1,26 @@
+.give-up-wrapper {
+    order: 1; 
+}
+
+.restart-wrapper {
+    order: 2; 
+}
+
+.give-up-button,
+.restart-button {
+    background: none;
+    border: none;
+    color: #000;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 8px 12px;
+    font-family: inherit; 
+}
+
+
+.give-up-button:disabled,
+.restart-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

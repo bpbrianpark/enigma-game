@@ -1,5 +1,7 @@
 'use client'
 
+import './leaderboard.css'
+
 import { Category, Difficulty, Game } from "@prisma/client";
 import { useCallback, useEffect, useState } from "react";
 import DifficultyPicker from "./DifficultyPicker";
@@ -11,6 +13,15 @@ interface LeaderboardProps {
     slug: string;
 }
 
+function formatTime(milliseconds: number): string {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
 export default function Leaderboard({ category, difficulties, initialGames, slug }: LeaderboardProps) {
     const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty | null>(
         difficulties.length > 0 ? difficulties[0] : null
@@ -18,7 +29,7 @@ export default function Leaderboard({ category, difficulties, initialGames, slug
     const [games, setGames] = useState<Game[]>(initialGames);
 
     const fetchGames = useCallback(async (difficultyId: string) => {
-        const url = new URL(`http://localhost:3000/api/games`);
+        const url = new URL(`/api/games`);
         url.searchParams.set("slug", slug);
         url.searchParams.set("difficultyId", difficultyId);
 
@@ -45,7 +56,7 @@ export default function Leaderboard({ category, difficulties, initialGames, slug
     return (
         <div className="leaderboard">
             <h1 className="leaderboard-title">
-                {category.name} Leaderboard ({selectedDifficulty?.level})
+                {category.name}
             </h1>
             <DifficultyPicker
                 difficulties={difficulties}
@@ -58,7 +69,7 @@ export default function Leaderboard({ category, difficulties, initialGames, slug
                     <tr className="table-headings">
                         <th className="table-text">Rank</th>
                         <th className="table-text">Player</th>
-                        <th className="table-text">Time (s)</th>
+                        <th className="table-text">Time</th>
                         <th className="table-text">Targets</th>
                     </tr>
                 </thead>
@@ -72,7 +83,7 @@ export default function Leaderboard({ category, difficulties, initialGames, slug
                                 {game.username}
                             </td>
                             <td className="time">
-                                {game.time}
+                                {formatTime(game.time)}
                             </td>
                             <td className="totalcount">
                                 {game.targetCount}

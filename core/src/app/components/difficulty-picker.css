@@ -1,0 +1,40 @@
+.difficulty-picker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.difficulty-options {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-width: 100%; 
+    gap: 20px; 
+}
+
+.difficulty-option {
+    flex: 1; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 36px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    text-align: center;
+}
+
+.difficulty-option.selected {
+    border-color: #007bff;
+    background-color: #007bff;
+    color: #000;
+}
+
+.difficulty-limit {
+    font-size: 12px;
+}

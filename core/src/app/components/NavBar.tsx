@@ -1,18 +1,15 @@
 "use client";
 
+import "./navbar.css";
 import Link from "next/link";
 
 export default function NavBar() {
   return (
     <nav className="navbar">
-      <div className="navbar-text-container">
-        <Link
-          href="/"
-          className="navbar-text"
-        >
-          Home
-        </Link>
-      </div>
+      <Link href="/">
+        <img src="/home.svg" alt="Home" className="home-icon" />
+      </Link>
     </nav>
   );
 }
+
