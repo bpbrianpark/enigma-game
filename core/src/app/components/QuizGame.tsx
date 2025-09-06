@@ -6,28 +6,19 @@ import { useState, useCallback, useMemo, useEffect } from 'react';
 import GuessInput from './GuessInput';
 import QuizTable from './QuizTable';
 import Stopwatch from './Stopwatch';
-import { Category, Difficulty, Entry } from '@prisma/client';
 import DifficultyPicker from './DifficultyPicker';
 import GiveUpButton from './GiveUpButton';
 import RestartButton from './RestartButton';
 import RegisterDialog from './RegisterDialog';
 import Link from "next/link";
+import { DifficultyType, EntryType, QuizGameClientPropsType } from "./types";
 
-interface QuizGameClientProps { 
-    category: Category;
-    difficulties: Difficulty[]
-    entries: Entry[];
-    totalEntries: number; 
-    slug: string;
-    isDynamic: boolean;
-}
-
-export default function QuizGame({ category, difficulties, entries, totalEntries, slug, isDynamic }: QuizGameClientProps) {
+export default function QuizGame({ category, difficulties, entries, totalEntries, slug, isDynamic }: QuizGameClientPropsType) {
     const [username, setUsername] = useState<string | null>(null)
-    const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty | null>(
+    const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyType | null>(
         difficulties.length > 0 ? difficulties[0] : null
     );
-    const [correctGuesses, setCorrectGuesses] = useState<Entry[]>([]);
+    const [correctGuesses, setCorrectGuesses] = useState<EntryType[]>([]);
     const [incorrectGuesses, setIncorrectGuesses] = useState<string[]>([]);
     const [finalTime, setFinalTime] = useState<number | null>(null);
     const [givenUp, setGivenUp] = useState(false);
@@ -47,7 +38,7 @@ export default function QuizGame({ category, difficulties, entries, totalEntries
         setUsername(submittedUser)
     }, [])
 
-    const handleCorrectGuess = useCallback((guess: Entry) => {
+    const handleCorrectGuess = useCallback((guess: EntryType) => {
         if (correctGuesses.includes(guess)) {
         return;
         }
@@ -55,7 +46,7 @@ export default function QuizGame({ category, difficulties, entries, totalEntries
         setCorrectGuesses(prev => [...prev, guess]);
     }, [correctGuesses]);
 
-    const handleDifficultyChange = useCallback((difficulty: Difficulty) => {
+    const handleDifficultyChange = useCallback((difficulty: DifficultyType) => {
         setSelectedDifficulty(difficulty);
         setGivenUp(false);
         setCorrectGuesses([]);
@@ -152,11 +143,12 @@ export default function QuizGame({ category, difficulties, entries, totalEntries
 
             <div className="give-up-restart-button-container">
             <GiveUpButton disabled={givenUp} onGiveUp={handleGiveUp}/>
-                        {isTargetEntriesGuessed && (
-                <Link href={`/leaderboard/${slug}`} className="quiz-completed-message">
-                    Leaderboards
-                </Link>
-            )}
+{/* @ts-ignore */}
+    {isTargetEntriesGuessed && (
+        <Link href={`/leaderboard/${slug}`} className="quiz-completed-message">
+            Leaderboards
+        </Link>
+    )}
             <RestartButton disabled={!isGameCompleted} onRestart={handleRestart}/>
             </div>
         </div>

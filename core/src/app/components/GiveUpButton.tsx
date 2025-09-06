@@ -2,7 +2,7 @@
 
 import "./button.css";
 
-import { useCallback, useMemo, useState } from 'react';
+import { useState } from 'react';
 
 interface GuessInputProps {
   onGiveUp: () => void;
@@ -10,7 +10,6 @@ interface GuessInputProps {
 }
 
 export default function GiveUpButton({ onGiveUp, disabled = false }: GuessInputProps) {
-  const [inputValue, setInputValue] = useState('');
 
   const handleSubmit = () => {
     if (disabled) return;

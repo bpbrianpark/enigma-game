@@ -2,16 +2,9 @@
 
 import './leaderboard.css'
 
-import { Category, Difficulty, Game } from "@prisma/client";
 import { useCallback, useEffect, useState } from "react";
 import DifficultyPicker from "./DifficultyPicker";
-
-interface LeaderboardProps { 
-    category: Category;
-    difficulties: Difficulty[];
-    initialGames: Game[];
-    slug: string;
-}
+import { DifficultyType, GameType, LeaderboardPropsType } from './types';
 
 function formatTime(milliseconds: number): string {
     const totalSeconds = Math.floor(milliseconds / 1000);
@@ -22,11 +15,11 @@ function formatTime(milliseconds: number): string {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
-export default function Leaderboard({ category, difficulties, initialGames, slug }: LeaderboardProps) {
-    const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty | null>(
+export default function Leaderboard({ category, difficulties, initialGames, slug }: LeaderboardPropsType) {
+    const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyType | null>(
         difficulties.length > 0 ? difficulties[0] : null
     );
-    const [games, setGames] = useState<Game[]>(initialGames);
+    const [games, setGames] = useState<GameType[]>(initialGames);
 
     const fetchGames = useCallback(async (difficultyId: string) => {
         const url = new URL(`/api/games`);
@@ -42,7 +35,7 @@ export default function Leaderboard({ category, difficulties, initialGames, slug
         setGames(data.slice(0, 25)); 
     }, [slug]);
 
-    const handleDifficultyChange = useCallback((difficulty: Difficulty) => {
+    const handleDifficultyChange = useCallback((difficulty: DifficultyType) => {
         setSelectedDifficulty(difficulty);
         fetchGames(difficulty.id);
     }, [fetchGames]);

@@ -3,21 +3,12 @@
 import './guess-input.css'
 
 import { useCallback, useMemo, useState } from 'react';
-import { Category, Entry } from '@prisma/client';
 import { queryWDQS } from '../../../lib/wdqs';
 import { normalize } from '../../../lib/normalize';
+import { CategoryType, EntryType, GuessInputProps } from './types';
 
-interface GuessInputProps {
-  category: Category;
-  entries: Entry[];
-  isDynamic: boolean;
-  isGameCompleted: boolean;
-  onCorrectGuess: (entry: Entry) => void;
-  onIncorrectGuess: (guess: string) => void;
-}
-
-function buildEntryHashMap(entries: Entry[]): Map<string, Entry> {
-    const hashMap = new Map<string, Entry>();
+function buildEntryHashMap(entries: EntryType[]): Map<string, EntryType> {
+    const hashMap = new Map<string, EntryType>();
 
     for (const entry of entries) {
         if (entry.norm) {
@@ -33,10 +24,10 @@ function buildCategoryQuery(updateSparql: string, guess: string): string {
 }
 
 async function checkAndInsertDynamic(
-  entryHashMap: Map<string, Entry>,
+  entryHashMap: Map<string, EntryType>,
   guess: string,
-  category: Category
-): Promise<Entry | null> {
+  category: CategoryType
+): Promise<EntryType | null> {
   if (!category.updateSparql) {
     return null;
   }
@@ -68,7 +59,7 @@ async function checkAndInsertDynamic(
       }),
     });
     if (res.ok) {
-      const entry: Entry = await res.json();
+      const entry: EntryType = await res.json();
       if (entry.norm) entryHashMap.set(entry.norm, entry);
       entryHashMap.set(normalize(entry.label), entry);
       return entry;
@@ -81,11 +72,11 @@ async function checkAndInsertDynamic(
 
 
 async function checkGuess(
-  category: Category,
+  category: CategoryType,
   guess: string,
-  entryHashMap: Map<string, Entry>,
+  entryHashMap: Map<string, EntryType>,
   isDynamic: boolean
-): Promise<Entry | null> {
+): Promise<EntryType | null> {
   const normalizedGuess = normalize(guess);
   const correspondingEntry = entryHashMap.get(normalizedGuess) || null;
   if (isDynamic && correspondingEntry === null) {
@@ -144,7 +135,7 @@ export default function GuessInput({ category, entries, isDynamic, isGameComplet
             triggerErrorEffect();
         }
 
-    }, [inputValue, entryHashMap, onCorrectGuess, onIncorrectGuess]);
+    }, [inputValue, entryHashMap, category, isDynamic, onCorrectGuess, onIncorrectGuess]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {

@@ -1,6 +1,4 @@
 import { prisma } from "../../../../lib/prisma";
-import { normalize } from "path";
-import { queryWDQS } from "../../../../lib/wdqs";
 import { NextRequest, NextResponse } from "next/server";
 
 // Endpoint to retrieve all the users (for the leaderboard)
@@ -53,10 +51,10 @@ export async function POST(req: NextRequest) {
         username: newUser.username
       }
     });
-  } catch (e: any) {
+  } catch (e) {
     return NextResponse.json({
       isAvailable: false,
-      message: 'Could not post user.'
+      message: 'Could not post user.', e
     }, { status: 409 })
   }
 }

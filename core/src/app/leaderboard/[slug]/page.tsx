@@ -49,9 +49,9 @@ async function getDifficulties(slug: string): Promise<Difficulty[]> {
 export default async function LeaderboardPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }) {
-  const { slug } = await params;
+  const { slug } = params;
   const category = await getCategory(slug);
   const difficulties = await getDifficulties(slug);
 
@@ -62,11 +62,12 @@ export default async function LeaderboardPage({
   return (
     <div className="p-6">
       <Leaderboard
-      category={category}
-      difficulties={difficulties}
-      initialGames={topGames}
-      slug={slug}
-      ></Leaderboard>
+        category={category}
+        difficulties={difficulties}
+        initialGames={topGames}
+        slug={slug}
+      />
     </div>
   );
 }
+

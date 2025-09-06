@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(entry, { status: 201 });
   } catch (e) {
     return NextResponse.json({
-      message: 'Could not add entry'
+      message: 'Could not add entry', e
     }, { status: 409 })
   }
 }

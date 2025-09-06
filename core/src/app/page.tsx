@@ -12,7 +12,6 @@ export default async function Home() {
             key={category.id}
             slug={category.slug}
             name={category.name}
-            imageUrl={'public/globe.svg'} 
           />
         ))}
       </div>

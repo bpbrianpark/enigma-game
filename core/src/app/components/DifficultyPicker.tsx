@@ -1,14 +1,7 @@
 'use client'
 
 import './difficulty-picker.css'
-import { Difficulty } from '@prisma/client';
-
-interface DifficultyPickerProps {
-  difficulties: Difficulty[];
-  selectedDifficulty: Difficulty | null;
-  onDifficultyChange: (difficulty: Difficulty) => void;
-  disabled?: boolean;
-}
+import { DifficultyPickerProps } from './types';
 
 function getDifficultyLabel(level: number): string {
   switch (level) {

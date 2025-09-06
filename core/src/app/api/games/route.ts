@@ -1,6 +1,4 @@
 import { prisma } from "../../../../lib/prisma";
-import { normalize } from "path";
-import { queryWDQS } from "../../../../lib/wdqs";
 import { NextRequest, NextResponse } from "next/server";
 
 // Endpoint to retrieve all the games (for the leaderboard)
@@ -60,7 +58,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(game, { status: 201 });
   } catch (e) {
     return NextResponse.json({
-      message: 'Could not post game.'
+      message: 'Could not post game.', e
     }, { status: 409 })
   }
 }

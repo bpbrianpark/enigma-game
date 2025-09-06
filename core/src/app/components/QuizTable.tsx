@@ -1,15 +1,9 @@
 'use client'
 
 import "./quiz-table.css";
+import { QuizTablePropsType } from "./types";
 
-import { Entry } from '@prisma/client';
-
-interface QuizTableProps {
-  correctGuesses: Entry[];
-  incorrectGuesses: string[];
-}
-
-export default function QuizTable({ correctGuesses, incorrectGuesses }: QuizTableProps) {
+export default function QuizTable({ correctGuesses, incorrectGuesses }: QuizTablePropsType) {
 
   return (
     <div className="quiz-table">
