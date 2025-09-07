@@ -1,9 +1,10 @@
+'use client'
+
 import './leaderboard.css'
 
 import { useCallback, useEffect, useState } from "react";
 import DifficultyPicker from "./DifficultyPicker";
 import { DifficultyType, GameType, LeaderboardPropsType } from './types';
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 function formatTime(milliseconds: number): string {
     const totalSeconds = Math.floor(milliseconds / 1000);
@@ -21,17 +22,22 @@ export default function Leaderboard({ category, difficulties, initialGames, slug
     const [games, setGames] = useState<GameType[]>(initialGames);
 
     const fetchGames = useCallback(async (difficultyId: string) => {
-        const url = new URL(`/api/games`);
-        url.searchParams.set("slug", slug);
-        url.searchParams.set("difficultyId", difficultyId);
-
-        const res = await fetch(url.toString(), { cache: "no-store" });
-        if (!res.ok) {
-            console.error("Failed to fetch games");
-            return;
+        try {
+            const res = await fetch(`/api/games?slug=${slug}&difficultyId=${difficultyId}`, { 
+                cache: "no-store" 
+            });
+            
+            if (!res.ok) {
+                console.error("Failed to fetch games");
+                return;
+            }
+            
+            const data = await res.json();
+            setGames(Array.isArray(data) ? data.slice(0, 25) : []); 
+        } catch (error) {
+            console.error("Error fetching games:", error);
+            setGames([]);
         }
-        const data = await res.json();
-        setGames(data.slice(0, 25)); 
     }, [slug]);
 
     const handleDifficultyChange = useCallback((difficulty: DifficultyType) => {

@@ -1,77 +1,48 @@
-"use client"
-
 import Leaderboard from "@/app/components/Leaderboard";
-import { Category, Difficulty, Game } from "@prisma/client";
+import { prisma } from "../../../../lib/prisma";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-async function getCategory(slug: string): Promise<Category> {
-  const res = await fetch(`/api/categories/${slug}`, {
-    cache: "no-store",
-  });
-
-  if (!res.ok) {
-    if (res.status === 404) notFound();
-    throw new Error("Failed to fetch entries");
-  }
-
-  return res.json();
-}
-
-async function getGames(slug: string, difficultyId: string): Promise<Game[]> {
-  const url = new URL(`/api/games`);
-  url.searchParams.set("slug", slug);
-  url.searchParams.set("difficultyId", difficultyId);
-
-  const res = await fetch(url.toString(), {
-    cache: "no-store",
-  });
-
-  if (!res.ok) {
-    if (res.status === 404) notFound();
-    throw new Error("Failed to fetch games.");
-  }
-
-  return res.json();
-}
-
-async function getDifficulties(slug: string): Promise<Difficulty[]> {
-  const res = await fetch(`/api/categories/${slug}/`, {
-    cache: "no-store",
-  });
-
-  if (!res.ok) {
-    if (res.status === 404) notFound();
-    throw new Error("Failed to fetch category.");
-  }
-
-  const data = await res.json();
-  return data.difficulties;
-}
 
 export default async function LeaderboardPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const { slug } = params;
-  const category = await getCategory(slug);
-  const difficulties = await getDifficulties(slug);
+  const { slug } = await params;
+  
+  const category = await prisma.category.findUnique({
+    where: { slug },
+    include: {
+      difficulties: {
+        orderBy: { level: 'asc' }
+      }
+    }
+  });
 
-  const games = await getGames(slug, difficulties[0].id);
+  if (!category) {
+    notFound();
+  }
 
-  const topGames = games.slice(0, 25);
+  const initialGames = await prisma.game.findMany({
+    where: {
+      slug: slug,
+      difficultyId: category.difficulties[0]?.id
+    },
+    orderBy: {
+      time: 'asc'
+    },
+    take: 25
+  });
 
   return (
     <div className="p-6">
       <Leaderboard
         category={category}
-        difficulties={difficulties}
-        initialGames={topGames}
+        difficulties={category.difficulties}
+        initialGames={initialGames}
         slug={slug}
       />
     </div>
   );
 }
-
