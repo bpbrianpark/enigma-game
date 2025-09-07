@@ -50,7 +50,7 @@ async function checkAndInsertDynamic(
   if (!label || !url) return null;
 
   try {
-    const res = await fetch(`api/categories/${category.slug}/entries`, {
+    const res = await fetch(`/api/categories/${category.slug}/entries`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
