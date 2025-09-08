@@ -8,6 +8,8 @@ import { queryWDQS } from '../../../lib/wdqs';
 import { normalize } from '../../../lib/normalize';
 import { CategoryType, EntryType, GuessInputProps } from './types';
 
+const FUZZY_THRESHOLD = 0.1;
+
 function buildEntryHashMap(entries: EntryType[]): Map<string, EntryType> {
     const hashMap = new Map<string, EntryType>();
 
@@ -74,13 +76,12 @@ async function checkAndInsertDynamic(
 function fuzzySearch(entries: EntryType[], guess: string): EntryType | null {
   const fuse = new Fuse(entries, {
     keys: ['label', 'norm'],
-    threshold: 0.3, // 0 = exact match, 1 = match anything
+    threshold: FUZZY_THRESHOLD,
     includeScore: true,
   });
 
   const results = fuse.search(guess);
   
-  // Return the best match if score is good enough
   if (results.length > 0 && results[0].score && results[0].score < 0.3) {
     return results[0].item;
   }
