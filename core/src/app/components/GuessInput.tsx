@@ -1,8 +1,7 @@
-
 'use client'
 
 import './guess-input.css'
-
+import Fuse from 'fuse.js'
 
 import { useCallback, useMemo, useState } from 'react';
 import { queryWDQS } from '../../../lib/wdqs';
@@ -70,18 +69,45 @@ async function checkAndInsertDynamic(
     console.error("Failed to insert entry via API:", err);
   }
     return null;
-  }
+}
 
+function fuzzySearch(entries: EntryType[], guess: string): EntryType | null {
+  const fuse = new Fuse(entries, {
+    keys: ['label', 'norm'],
+    threshold: 0.3, // 0 = exact match, 1 = match anything
+    includeScore: true,
+  });
+
+  const results = fuse.search(guess);
+  
+  // Return the best match if score is good enough
+  if (results.length > 0 && results[0].score && results[0].score < 0.3) {
+    return results[0].item;
+  }
+  
+  return null;
+}
 
 async function checkGuess(
   category: CategoryType,
   guess: string,
   entryHashMap: Map<string, EntryType>,
+  entries: EntryType[],
   isDynamic: boolean
 ): Promise<EntryType | null> {
   const normalizedGuess = normalize(guess);
+  
   const correspondingEntry = entryHashMap.get(normalizedGuess) || null;
-  if (isDynamic && correspondingEntry === null) {
+  if (correspondingEntry) {
+    return correspondingEntry;
+  }
+  
+  const fuzzyMatch = fuzzySearch(entries, guess);
+  if (fuzzyMatch) {
+    return fuzzyMatch;
+  }
+  
+  if (isDynamic) {
     const verifiedEntry = await checkAndInsertDynamic(entryHashMap, guess, category);
     if (!verifiedEntry) {
       return null;
@@ -89,9 +115,8 @@ async function checkGuess(
     return verifiedEntry
   }
 
-  return correspondingEntry;
+  return null;
 }
-
 
 export default function GuessInput({ category, entries, isDynamic, isGameCompleted, onCorrectGuess, onIncorrectGuess }: GuessInputProps) {
   const entryHashMap = useMemo(() => {
@@ -101,18 +126,15 @@ export default function GuessInput({ category, entries, isDynamic, isGameComplet
   const [showCorrectEffect, setShowCorrectEffect] = useState(false);
   const [showErrorEffect, setShowErrorEffect] = useState(false);
 
-  
   const triggerCorrectEffect = () => {
       setShowCorrectEffect(true);
       setTimeout(() => setShowCorrectEffect(false), 400); 
   };
 
-
   const triggerErrorEffect = () => {
       setShowErrorEffect(true);
       setTimeout(() => setShowErrorEffect(false), 400); 
   };
-
 
   const handleSubmit = useCallback(async (e?: React.FormEvent) => {
         if (e) {
@@ -123,7 +145,7 @@ export default function GuessInput({ category, entries, isDynamic, isGameComplet
             return;
         }
         
-        const correctEntry = await checkGuess(category, inputValue, entryHashMap, isDynamic);
+        const correctEntry = await checkGuess(category, inputValue, entryHashMap, entries, isDynamic);
 
         if (correctEntry) {
             console.log("Correct Entry! :", correctEntry)
@@ -137,7 +159,7 @@ export default function GuessInput({ category, entries, isDynamic, isGameComplet
             triggerErrorEffect();
         }
 
-    }, [inputValue, entryHashMap, category, isDynamic, onCorrectGuess, onIncorrectGuess]);
+    }, [inputValue, entryHashMap, entries, category, isDynamic, onCorrectGuess, onIncorrectGuess]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
