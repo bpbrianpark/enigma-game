@@ -100,7 +100,8 @@ export default function QuizGame({ category, difficulties, entries, totalEntries
             slug: slug,
             difficultyId: selectedDifficulty?.id,
             time: time,
-            targetCount: targetEntries
+            targetCount: targetEntries,
+            correct_count: correctGuesses.length
         }
 
         try {
@@ -119,10 +120,10 @@ export default function QuizGame({ category, difficulties, entries, totalEntries
         } catch (e) {
             console.log("Error posting game", e);
         }
-    },[username, slug, selectedDifficulty, targetEntries]);
+    },[username, slug, selectedDifficulty, targetEntries, correctGuesses]);
 
     useEffect(() => {
-        if (isTargetEntriesGuessed && finalTime !== null && !givenUp && username && selectedDifficulty) {
+        if (isTargetEntriesGuessed && finalTime !== null && username && selectedDifficulty || givenUp && finalTime !== null) {
             postGameData(finalTime);
         }
     }, [isTargetEntriesGuessed, finalTime, givenUp, username, selectedDifficulty, postGameData]);
@@ -145,7 +146,7 @@ export default function QuizGame({ category, difficulties, entries, totalEntries
 
             <div className="give-up-restart-button-container">
             <GiveUpButton disabled={givenUp} onGiveUp={handleGiveUp}/>
-{/* @ts-ignore */}
+
     {isTargetEntriesGuessed && (
         <Link href={`/leaderboard/${slug}`} className="quiz-completed-message">
             Leaderboards

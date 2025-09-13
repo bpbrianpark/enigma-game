@@ -51,6 +51,7 @@ export interface GameType {
   difficultyId: string;
   time: number;
   targetCount: number;
+  correct_count: number;
 }
 
 export interface DifficultyPickerProps {

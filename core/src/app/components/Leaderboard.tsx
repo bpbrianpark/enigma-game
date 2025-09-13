@@ -68,6 +68,7 @@ export default function Leaderboard({ category, difficulties, initialGames, slug
                         <th className="table-text">Rank</th>
                         <th className="table-text">Player</th>
                         <th className="table-text">Time</th>
+                        <th className="table-text">Correct Guesses</th>
                         <th className="table-text">Targets</th>
                     </tr>
                 </thead>
@@ -82,6 +83,9 @@ export default function Leaderboard({ category, difficulties, initialGames, slug
                             </td>
                             <td className="time">
                                 {formatTime(game.time)}
+                            </td>
+                            <td className="totalcount">
+                                {game.correct_count}
                             </td>
                             <td className="totalcount">
                                 {game.targetCount}
