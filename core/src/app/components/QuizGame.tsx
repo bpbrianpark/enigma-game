@@ -94,7 +94,8 @@ export default function QuizGame({ category, difficulties, entries, totalEntries
 
     const postGameData = useCallback(async (time?: number) => {
         if (!username) return;
-
+        console.log("Posting This: ", correctGuesses.length)
+        if (correctGuesses.length === 0) return;
         const gameData = {
             username,
             slug: slug,
