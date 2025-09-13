@@ -36,9 +36,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { slug, difficultyId, time, targetCount, username } = body
+    const { slug, difficultyId, time, targetCount, username, current_count } = body
 
-    if (!slug || !difficultyId || !time || !targetCount || !username) {
+    if (!slug || !difficultyId || !time || !targetCount || !username || !current_count) {
       return NextResponse.json(
         { error: "Missing required field."},
         { status: 400 }
@@ -51,7 +51,8 @@ export async function POST(req: NextRequest) {
         difficultyId,
         time,
         targetCount,
-        username
+        username,
+        current_count
       }
     });
 
