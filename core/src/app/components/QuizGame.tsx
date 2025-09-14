@@ -135,6 +135,15 @@ export default function QuizGame({ category, difficulties, entries, totalEntries
             onUsernameSubmit={handleUsernameSubmit}
             /> }
         <div className="quiz-top-layer">
+            <div className="difficulty-picker-container">
+                <DifficultyPicker
+                    difficulties={difficulties}
+                    selectedDifficulty={selectedDifficulty}
+                    onDifficultyChange={handleDifficultyChange}
+                    disabled={isTargetEntriesGuessed}
+                ></DifficultyPicker>
+            </div>
+
             <div className="category-name">
             {category.name}
             </div>
@@ -181,18 +190,6 @@ export default function QuizGame({ category, difficulties, entries, totalEntries
             <div className="progress-text">
                 {correctGuesses.length} / {targetEntries}
             </div>
-        </div>
-
-        <div className="quiz-third-layer">
-            <div className="difficulty-picker">
-                <DifficultyPicker
-                    difficulties={difficulties}
-                    selectedDifficulty={selectedDifficulty}
-                    onDifficultyChange={handleDifficultyChange}
-                    disabled={isTargetEntriesGuessed}
-                ></DifficultyPicker>
-            </div>
-
         </div>
 
         <QuizTable 
