@@ -1,3 +1,4 @@
+import Link from "next/link";
 import "./quiz-table.css";
 import { QuizTablePropsType } from "./types";
 
@@ -19,7 +20,11 @@ export default function QuizTable({ correctGuesses, incorrectGuesses }: QuizTabl
                     key={`correct-${guess.id}-${index}`} 
                     className="correct-guess"
                 >
-                    <span className="correct-guess-text">{index + 1}. {guess.label}</span>
+                  <Link href={guess.url} target="_blank" rel="noopener noreferrer">
+                    <span className="correct-guess-text">
+                      {index + 1}. {guess.label}
+                    </span>
+                  </Link>
                 </div>
                 ))}
             </div>

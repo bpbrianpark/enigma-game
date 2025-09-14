@@ -50,6 +50,11 @@
     margin-bottom: 6px; 
 }
 
+.correct-guess a {
+    color: #000;
+    text-decoration: none;
+}
+
 .incorrect-guess:last-child,
 .correct-guess:last-child {
     margin-bottom: 0; 
