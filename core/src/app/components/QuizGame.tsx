@@ -146,12 +146,24 @@ export default function QuizGame({ category, difficulties, entries, totalEntries
             />
 
             <div className="give-up-restart-button-container">
-            <GiveUpButton disabled={givenUp} onGiveUp={handleGiveUp}/>
+            <GiveUpButton disabled={isGameCompleted} onGiveUp={handleGiveUp}/>
 
         <Link href={`/leaderboard/${slug}`} className="quiz-completed-message">
             Leaderboards
         </Link>
             <RestartButton disabled={!isGameCompleted} onRestart={handleRestart}/>
+            </div>
+
+            <div className="completed-game-message-container">
+                {givenUp && 
+                <span className="completed-game-message">
+                    ❌ You gave up. Try again! ❌
+                    </span>}
+
+                {isTargetEntriesGuessed && 
+                <span className="completed-game-message">
+                    ✅ Good job! Check how you did on the leaderboard! ✅
+                    </span>}
             </div>
         </div>
 
