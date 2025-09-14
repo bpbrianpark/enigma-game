@@ -1,3 +1,4 @@
+import Link from "next/link";
 import "./register-dialog.css";
 import { useState } from 'react';
 
@@ -63,6 +64,9 @@ export default function RegisterDialog({ onUsernameSubmit }: RegisterDialogProps
         <div className="register-overlay">
         <div className="register-dialog">
             <form onSubmit={handleSubmit}>
+                <Link href="/" className="exit-icon-container">
+                        <img src="/xcircle.svg" alt="Exit Icon" className="exit-icon" />
+                    </Link>
                 <span className="enter-username-text">Enter Username</span>
                 <input
                     type="text"
