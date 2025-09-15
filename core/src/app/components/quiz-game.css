@@ -1,80 +1,100 @@
 .quiz-container {
-    display: flex; 
-    flex-direction: column; 
-    justify-content: flex-start; 
-    align-items: center; 
-    width: 100%;
-    height: 100%;
-    position: relative; 
-    gap: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  gap: 16px;
 }
 
 .quiz-top-layer {
-    flex-grow: 0; 
-    flex-shrink: 0; 
-    width: 100%; 
-    justify-items: center;
+  flex-grow: 0;
+  flex-shrink: 0;
+  width: 100%;
+  justify-items: center;
 }
 
 .quiz-second-layer {
-    display: flex; 
-    flex-direction: row;
-    justify-content: center; 
-    align-items: center; 
-    flex-grow: 0; 
-    flex-shrink: 0; 
-    position: relative; 
-    gap: 8px;
-    width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 0;
+  flex-shrink: 0;
+  position: relative;
+  gap: 8px;
+  width: 100%;
 }
 
 .progress-text {
-    flex-grow: 0; 
-    flex-shrink: 0; 
-    width: 45px; 
-    height: 12px; 
-    padding-bottom: 6px;
-    font-size: 16px; 
-    text-align: left; 
-    justify-self: center;
-    align-self: center;
-    color: #000;
-    font-weight: bold;
+  flex-grow: 0;
+  flex-shrink: 0;
+  width: 45px;
+  height: 12px;
+  padding-bottom: 6px;
+  font-size: 16px;
+  text-align: left;
+  justify-self: center;
+  align-self: center;
+  color: #000;
+  font-weight: bold;
 }
 
 .category-name {
-    width: 100%; 
-    height: 25%; 
-    font-size: 24px; 
-    font-weight: 700; 
-    text-align: center; 
-    color: #000;
-    font-weight: bold;
+  width: 100%;
+  height: 25%;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  color: #000;
+  font-weight: bold;
 }
 
 .give-up-restart-button-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between; 
-    width: 35%; 
-    flex-direction: row; 
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 35%;
+  flex-direction: row;
 }
 
 .completed-game-message-container {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .completed-game-message {
-    width: 100%; 
-    height: 25%; 
-    font-size: 24px; 
-    font-weight: 700; 
-    text-align: center; 
-    color: #000;
-    font-weight: bold;
+  width: 100%;
+  height: 25%;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  color: #000;
+  font-weight: bold;
 }
 
 .difficulty-picker-container {
-    margin: 20px;
+  margin: 20px;
+}
+
+.not-logged-in-container {
+  margin: 10px 0;
+  padding: 12px;
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+  text-align: "center";
+}
+
+.not-logged-in-text {
+  margin: 0;
+  font-size: 14px;
+  color: #856404;
+}
+
+.not-logged-in-link {
+  color: #007bff;
+  text-decoration: underline;
 }

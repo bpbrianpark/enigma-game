@@ -1,15 +1,9 @@
-"use client";
+import { getServerSession } from "next-auth/next";
+import ClientNavBar from "./ClientNavBar";
+import { authOptions } from "../../../lib/auth";
 
-import "./navbar.css";
-import Link from "next/link";
-
-export default function NavBar() {
-  return (
-    <nav className="navbar">
-      <Link href="/">
-        <img src="/home.svg" alt="Home" className="home-icon" />
-      </Link>
-    </nav>
-  );
+export default async function NavBar() {
+  const session = await getServerSession(authOptions);
+  
+  return <ClientNavBar initialSession={session} />;
 }
-
