@@ -169,12 +169,6 @@ export default function SignUpForm() {
               Sign in
             </Link>
           </div>
-          <button
-            type="button"
-            onClick={() => signIn("google", { callbackUrl })}
-          >
-            Sign in with Google
-          </button>
         </form>
       </div>
     </div>
