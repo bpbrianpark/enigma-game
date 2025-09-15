@@ -38,6 +38,7 @@ model Category {
   entries   Entry[]
   difficulties  Difficulty[]
   games     Game[]
+  aliases Alias[]
 }
 
 model Difficulty {
@@ -68,6 +69,8 @@ model Alias {
   id       String @id @default(cuid())
   entry    Entry  @relation(fields: [entryId], references: [id])
   entryId  String
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
 
   label String
   norm  String

@@ -14,6 +14,7 @@ import Link from "next/link";
 import { DifficultyType, EntryType, QuizGameClientPropsType } from "./types";
 
 export default function QuizGame({
+    aliases,
   category,
   difficulties,
   entries,
@@ -235,6 +236,7 @@ export default function QuizGame({
       <div className="quiz-second-layer">
         {category && (
           <GuessInput
+            aliases={aliases}
             category={category}
             entries={entries}
             isDynamic={isDynamic}

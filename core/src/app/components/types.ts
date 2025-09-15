@@ -1,4 +1,4 @@
-import { Category, Difficulty, Entry, Game } from '@prisma/client';
+import { Alias, Category, Difficulty, Entry, Game } from '@prisma/client';
 import { Session } from 'next-auth';
 
 export interface UserType {
@@ -63,6 +63,7 @@ export interface DifficultyPickerProps {
 }
 
 export interface GuessInputProps {
+  aliases: Alias[];
   category: Category;
   entries: Entry[];
   isDynamic: boolean;
@@ -79,6 +80,7 @@ export interface LeaderboardPropsType {
 }
 
 export interface QuizGameClientPropsType { 
+  aliases?: Alias[];
     category?: Category;
     difficulties?: Difficulty[]
     entries?: Entry[];

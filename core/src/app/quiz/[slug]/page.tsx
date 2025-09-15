@@ -6,18 +6,26 @@ import { getServerSession } from "next-auth";
 
 export const dynamic = "force-dynamic";
 
-export default async function QuizPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params; 
-  const session = await getServerSession(authOptions)
-  
+export default async function QuizPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const session = await getServerSession(authOptions);
+
   const category = await prisma.category.findUnique({
     where: { slug },
     include: {
       difficulties: {
-        orderBy: { level: 'asc' }
+        orderBy: { level: "asc" },
       },
-      entries: true
-    }
+      entries: true,
+    },
+  });
+
+  const aliases = await prisma.alias.findMany({
+    where: { categoryId: category?.id },
   });
 
   if (!category) {
@@ -25,7 +33,8 @@ export default async function QuizPage({ params }: { params: Promise<{ slug: str
   }
 
   return (
-    <QuizGame 
+    <QuizGame
+      aliases={aliases}
       category={category}
       difficulties={category.difficulties || []}
       entries={category.entries || []}
