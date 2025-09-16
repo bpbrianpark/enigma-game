@@ -3,7 +3,7 @@
     height: 100%; 
     font-size: 96px; 
     text-align: center; 
-    color: #fff;
+    color: var(--font-dark);
     font-family: inter;
     justify-self: center
 }

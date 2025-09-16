@@ -1,4 +1,4 @@
-import { Alias, Category, Difficulty, Entry, Game } from '@prisma/client';
+import { Alias, Category, Difficulty, Entry, Game, User } from '@prisma/client';
 import { Session } from 'next-auth';
 
 export interface UserType {
@@ -93,4 +93,11 @@ export interface QuizGameClientPropsType {
 export interface QuizTablePropsType {
   correctGuesses: Entry[];
   incorrectGuesses: string[];
+}
+
+export interface ProfileClientPropsType {
+  categories: Category[];
+  difficulties: Difficulty[];
+  user: User;
+  games: Game[];
 }

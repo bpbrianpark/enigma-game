@@ -38,7 +38,7 @@ export default function QuizTable({ correctGuesses, incorrectGuesses }: QuizTabl
           </span>
           <div className="guesses">
             {incorrectGuesses.length === 0 ? (
-              <p className="incorrect-placeholder">No incorrect guesses yet...</p>
+              <p className="placeholder">No incorrect guesses yet...</p>
             ) : (
               <div className="guess-list">
                 {incorrectGuesses.map((guess, index) => (

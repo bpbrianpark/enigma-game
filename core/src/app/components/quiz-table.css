@@ -12,7 +12,7 @@
     flex-direction: column; 
     justify-content: flex-start; 
     align-items: center; 
-    width: 50%;
+    width: 40%;
     position: relative; 
 }
 
@@ -20,7 +20,7 @@
     width: 80%; 
     height: 30px; 
     border-radius: 4px; 
-    background: #91aea1;
+    background: #059669;
     font-size: 16px;
     text-align: center;
     color: #fff;
@@ -58,6 +58,10 @@
 .incorrect-guess:last-child,
 .correct-guess:last-child {
     margin-bottom: 0; 
+}
+
+.placeholder {
+    justify-self: center;
 }
 
 .incorrect-guess-text,

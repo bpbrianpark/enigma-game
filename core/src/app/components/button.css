@@ -8,19 +8,87 @@
 
 .give-up-button,
 .restart-button {
-    background: none;
-    border: none;
-    color: #000;
-    text-decoration: underline;
+    background: white;
+    border: 1px solid var(--font-white);
+    color: var(--font-dark);
     cursor: pointer;
-    font-size: 16px;
-    padding: 8px 12px;
-    font-family: inherit; 
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    text-decoration: none;
+    letter-spacing: 0.25px;
 }
 
+.signin-button,
+.signout-button {
+    background: white;
+    border: 1px solid var(--font-white);
+    color: var(--font-dark);
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    text-decoration: none;
+    letter-spacing: 0.25px;
+}
+
+.signin-button:hover,
+.signout-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-color: var(--font-white);
+    background: var(--font-white);
+}
+
+.give-up-button:hover,
+.restart-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: var(--font-white);
+    background: var(--font-white);
+}
+
+.give-up-button:active,
+.restart-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
 
 .give-up-button:disabled,
 .restart-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    background: var(--font-white);
+    border-color: var(--font-white);
+}
+
+.give-up-button:disabled:hover,
+.restart-button:disabled:hover {
+    transform: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    background: var(--font-white);
+    border-color: var(--font-white);
+}
+
+.leaderboard-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.leaderboard-button {
+  color: var(--font-dark);
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
 }

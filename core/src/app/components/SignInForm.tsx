@@ -68,10 +68,7 @@ export default function SignInForm() {
         <div className="register-overlay"> 
             <div className="sign-in-dialog">
                 <form onSubmit={handleSubmit}>
-                    <Link href="/" className="exit-icon-container">
-                        <img src="/xcircle.svg" alt="Exit Icon" className="exit-icon" />
-                    </Link>
-                    <span className="enter-email-text">Sign In</span>
+                    <span className="enter-username-text">Sign In</span>
                     
                     <input
                         type="email"

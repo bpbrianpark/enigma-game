@@ -31,14 +31,13 @@
 .progress-text {
   flex-grow: 0;
   flex-shrink: 0;
-  width: 45px;
   height: 12px;
   padding-bottom: 6px;
   font-size: 16px;
   text-align: left;
   justify-self: center;
   align-self: center;
-  color: #000;
+  color: var(--font-dark);
   font-weight: bold;
 }
 
@@ -48,7 +47,7 @@
   font-size: 24px;
   font-weight: 700;
   text-align: center;
-  color: #000;
+  color: var(--font-dark);
   font-weight: bold;
 }
 
@@ -71,7 +70,7 @@
   font-size: 24px;
   font-weight: 700;
   text-align: center;
-  color: #000;
+  color: var(--font-dark);
   font-weight: bold;
 }
 

@@ -12,6 +12,7 @@ import GiveUpButton from "./GiveUpButton";
 import RestartButton from "./RestartButton";
 import Link from "next/link";
 import { DifficultyType, EntryType, QuizGameClientPropsType } from "./types";
+import LeaderboardButton from "./LeaderboardButton";
 
 export default function QuizGame({
     aliases,
@@ -180,21 +181,18 @@ export default function QuizGame({
           onResetComplete={handleStopwatchReset}
           onTimeUpdate={handleStopwatchUpdate}
         />
+        
 
         <div className="give-up-restart-button-container">
           <GiveUpButton disabled={isGameCompleted} onGiveUp={handleGiveUp} />
 
-          <Link
-            href={`/leaderboard/${slug}`}
-            className="quiz-completed-message"
-          >
-            Leaderboards
-          </Link>
           <RestartButton
             disabled={!isGameCompleted}
             onRestart={handleRestart}
           />
         </div>
+
+        <LeaderboardButton slug={slug}/>
         {status !== "loading" && !session && (
           <div
             className="not-logged-in-container"

@@ -81,7 +81,7 @@ export default function SignUpForm() {
       if (signInResult?.ok) {
         router.push(callbackUrl);
       } else {
-        setError(
+      setError(
           "Registration successful, but auto sign-in failed. Please sign in manually."
         );
         triggerErrorEffect();
@@ -100,12 +100,8 @@ export default function SignUpForm() {
   };
 
   return (
-    <div className="register-overlay">
       <div className="register-dialog">
         <form onSubmit={handleSubmit}>
-          <Link href="/" className="exit-icon-container">
-            <img src="/xcircle.svg" alt="Exit Icon" className="exit-icon" />
-          </Link>
           <span className="enter-username-text">Create Account</span>
 
           <input
@@ -171,6 +167,5 @@ export default function SignUpForm() {
           </div>
         </form>
       </div>
-    </div>
   );
 }
