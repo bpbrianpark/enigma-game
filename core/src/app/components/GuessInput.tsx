@@ -25,7 +25,6 @@ function buildEntryMaps(entries: EntryType[]) {
   return { entryByNorm, entryByUrl };
 }
 
-
 function buildAliasHashMap(aliases: AliasType[]): Map<string, AliasType> {
   const hashMap = new Map<string, AliasType>();
 
@@ -44,6 +43,123 @@ function buildCategoryQuery(updateSparql: string, guess: string): string {
   return updateSparql.replace("SEARCH_TERM", `${guess}`);
 }
 
+async function insertAlias(
+  alias: string,
+  guess: string,
+  normalizedGuess: string,
+  category: CategoryType,
+  aliasHashMap: Map<string, AliasType>,
+  entry: EntryType
+): Promise<EntryType | null> {
+  if (normalize(alias) != normalizedGuess) {
+    return null
+  }
+  try {
+    const res = await fetch(`/api/categories/${category.slug}/aliases`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        categoryId: category.id,
+        entryId: entry.id,
+        label: guess,
+        norm: normalizedGuess,
+      }),
+    });
+
+    if (res.ok) {
+      const alias: AliasType = await res.json();
+      if (alias.norm) aliasHashMap.set(alias.norm, alias);
+      return entry;
+    }
+  } catch (e) {
+    console.error("Failed to insert alias", e);
+  }
+  return null;
+}
+
+async function insertNewEntry(
+  category: CategoryType,
+  label: string,
+  normalizedLabel: string,
+  url: string,
+  entryByNorm: Map<string, EntryType>,
+  entryByUrl: Map<string, EntryType>
+): Promise<EntryType | null> {
+  try {
+    const res = await fetch(`/api/categories/${category.slug}/entries`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        categoryId: category.id,
+        label,
+        norm: normalizedLabel,
+        url,
+      }),
+    });
+
+    if (res.ok) {
+      const entry: EntryType = await res.json();
+      if (entry.norm) entryByNorm.set(entry.norm, entry);
+      entryByNorm.set(normalize(entry.label), entry);
+      if (entry.url) entryByUrl.set(entry.url, entry);
+      return entry;
+    }
+  } catch (err) {
+    console.error("Failed to insert entry via API:", err);
+  }
+  return null;
+}
+
+async function handleBinding(
+  binding: any,
+  guess: string,
+  normalizedGuess: string,
+  category: CategoryType,
+  aliasHashMap: Map<string, AliasType>,
+  entryByNorm: Map<string, EntryType>,
+  entryByUrl: Map<string, EntryType>
+): Promise<EntryType | null> {
+  const label = binding.itemLabel?.value ?? binding.item_label?.value;
+  const url = binding.item?.value;
+  const alias = binding.alias?.value;
+
+  if (!label || !url) return null;
+
+  const normalizedLabel = normalize(label);
+
+  // If alias exists, check if label and alias is within threshold
+  // If alias doesn't exist, only check if label is within threshold
+  let normalizedAlias;
+  if (alias) { 
+    normalizedAlias = normalize(alias);
+    
+    if ((Math.abs(normalizedLabel.length - guess.length) > LENGTH_DIFF_THRESHOLD)
+   && (Math.abs(normalizedAlias.length - guess.length) > LENGTH_DIFF_THRESHOLD)) {
+    return null;
+  }
+  } else {
+    if ((Math.abs(normalizedLabel.length - guess.length) > LENGTH_DIFF_THRESHOLD)) {
+      return null;
+    }
+  }
+
+  // Insert alias if the entry already exists in the DB
+  if (entryByUrl.has(url)) {
+    return await insertAlias(
+      alias,
+      guess,
+      normalizedGuess,
+      category,
+      aliasHashMap,
+      entryByUrl.get(url)!
+    );
+  }
+
+  // Return null if the entry's alias doesn't match the given alias
+  return await insertNewEntry(category, label, normalizedLabel, url, entryByNorm, entryByUrl);
+}
+
+
 async function checkAndInsertDynamic(
   aliasHashMap: Map<string, AliasType>,
   entryByNorm: Map<string, EntryType>,
@@ -51,104 +167,31 @@ async function checkAndInsertDynamic(
   guess: string,
   category: CategoryType
 ): Promise<EntryType | null> {
-  if (!category.updateSparql) {
-    return null;
-  }
+  if (!category.updateSparql) return null;
 
   const sparqlWithGuess = buildCategoryQuery(category.updateSparql, guess);
-
   const data = await queryWDQS(sparqlWithGuess);
 
-  if (data.results.bindings.length === 0) {
-    return null;
-  }
+  if (data.results.bindings.length === 0) return null;
 
-  let base_title_url;
-  let result_entry = null;
-  
-  // store the base title url. if there's a match, set that to be the base title url
-  // as you go through the list, check if the binding's url matches that of the base title url. if it does, add it to the alias list (it needs to link to the entry that was added earlier... needs to store something perhaps?)
-  // if the first result doesn't match the length requirements, perhaps ignore it. should be a flag to see if its null atm or smt
-  // if there IS A result, use the guess as an alias?
-
-
-  // ok so basically
-  // if there's a result that already exists in the list of entries... add your guess to the list of aliases
-
+  const normalizedGuess = normalize(guess);
   console.log("Bindings: ", data.results.bindings)
   for (const binding of data.results.bindings) {
-    const label = binding.itemLabel?.value ?? binding.item_label?.value;
-    const url = binding.item?.value;
-
-    if (!label || !url) return null;
-
-    const normalizedLabel = normalize(label);
-    const normalizedGuess = normalize(guess);
-
-    console.log("Now we checking: ", normalizedLabel)
-    console.log("Base Title URL: ", base_title_url)
-    console.log("URL: ", url)
-    console.log("Result Entry: ", result_entry)
-
-    if (entryByUrl.has(url) && entryByUrl.get(url)) {
-      const aliasEntry = entryByUrl.get(url)
-      if (!aliasEntry) return null
-      console.log("it has the alias url man")
-      try {
-        console.log("We're inputting: ", guess, normalizedGuess)
-        const res = await fetch(`/api/categories/${category.slug}/aliases`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" }, 
-          body: JSON.stringify({
-            categoryId: category.id,
-            entryId: aliasEntry.id,
-            label: guess,
-            norm: normalizedGuess,
-          }),
-        });
-
-        if (res.ok) {
-          const alias: AliasType = await res.json();
-          if (alias.norm) aliasHashMap.set(alias.norm, alias);
-          return aliasEntry
-        }
-      } catch (e) {
-        console.error("Failed to insert alias", e)
-      }
-    }
-
-    if (
-      Math.abs(normalizedLabel.length - guess.length) > LENGTH_DIFF_THRESHOLD
-    ) {
-      continue;
-    }
-
-
-    try {
-      const res = await fetch(`/api/categories/${category.slug}/entries`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          categoryId: category.id,
-          label,
-          norm: normalizedLabel,
-          url,
-        }),
-      });
-      if (res.ok) {
-        const entry: EntryType = await res.json();
-        if (entry.norm) entryByNorm.set(entry.norm, entry);
-        entryByNorm.set(normalize(entry.label), entry);
-        result_entry = entry
-        base_title_url = url
-        return entry;
-      }
-    } catch (err) {
-      console.error("Failed to insert entry via API:", err);
-    }
+    const entry = await handleBinding(
+      binding,
+      guess,
+      normalizedGuess,
+      category,
+      aliasHashMap,
+      entryByNorm,
+      entryByUrl
+    );
+    if (entry) return entry;
   }
-  return null
+
+  return null;
 }
+
 
 function fuzzySearch(entries: EntryType[], guess: string): EntryType | null {
   const fuse = new Fuse(entries, {
@@ -216,20 +259,21 @@ async function checkGuess(
     return fuzzyMatch;
   }
 
-  // TODO:
-  // check if exists in hashmap of alias
-  const correspondingAlias = aliasHashMap.get(normalizedGuess) || null;
-  if (correspondingAlias) {
-    // return the entry that corresponds to that Alias
-    // correspondingAlias.entryId (find or something)
+const correspondingAlias = aliasHashMap.get(normalizedGuess) || null;
+if (correspondingAlias) {
+  const entry = entries.find((e) => e.id === correspondingAlias.entryId) || null;
+  if (entry) {
+    return entry;
   }
+}
 
-  // check if exists in fuzzymatch of alias
-  const aliasFuzzyMatch = fuzzySearchAlias(aliases, guess);
-  if (aliasFuzzyMatch) {
-    // return the entry that corresponds to that Alias
-    // aliasFuzzyMatch.entryId (find or something)
+const aliasFuzzyMatch = fuzzySearchAlias(aliases, guess);
+if (aliasFuzzyMatch) {
+  const entry = entries.find((e) => e.id === aliasFuzzyMatch.entryId) || null;
+  if (entry) {
+    return entry;
   }
+}
 
   if (isDynamic) {
     const verifiedEntry = await checkAndInsertDynamic(

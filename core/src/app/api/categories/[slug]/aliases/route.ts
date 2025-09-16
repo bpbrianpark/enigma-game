@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../../../../../lib/prisma";
 
-// POST create a new alias
 export async function POST(
   req: Request
 ) {
@@ -9,7 +8,6 @@ export async function POST(
     const body = await req.json();
     const { categoryId, entryId, label, norm } = body;
 
-    // quick sanity check
     if (!categoryId || !entryId || !label || !norm) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
