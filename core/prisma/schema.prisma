@@ -48,6 +48,7 @@ model Difficulty {
 
   level Int
   limit Int
+  timeLimit Int?
 
   games Game[]
 }
@@ -84,8 +85,9 @@ model Game {
   slug  String
   difficultyId  String
   time    Int
-  targetCount Int
+  targetCount Int?
   correct_count Int
+  isBlitzGame Boolean?
 
   user  User  @relation(fields:[username],references:[username], onDelete: Cascade)
   category  Category  @relation(fields:[slug],references:[slug], onDelete:Cascade)

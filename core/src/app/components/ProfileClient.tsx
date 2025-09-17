@@ -40,6 +40,14 @@ export default function ProfileClient({
     return category?.name || slug;
   };
 
+  const normalGames = useMemo(() => {
+  return sortedGames.filter(game => game.isBlitzGame === null || game.isBlitzGame === undefined);
+}, [sortedGames]);
+
+const blitzGames = useMemo(() => {
+  return sortedGames.filter(game => game.isBlitzGame === true);
+}, [sortedGames]);
+
   const findDifficulty = (difficultyId: string) => {
   const difficulty = difficulties.find(diff => diff.id === difficultyId);
   if (!difficulty) return 'Unknown';
@@ -58,6 +66,11 @@ export default function ProfileClient({
     default:
       return `Level ${difficulty.level}`;
   }
+}
+
+const formatBlitzTime = (difficultyId: string) => {
+  const difficulty = difficulties.find(diff => diff.id === difficultyId);
+  return formatTime(difficulty?.timeLimit) || 0
 }
 
     function formatTime(milliseconds: number): string {
@@ -103,14 +116,14 @@ export default function ProfileClient({
       </div>
 
       <div className="games-section">
-        <h2>Game History</h2>
-        {sortedGames.length === 0 ? (
+        <h2>Normal Game History</h2>
+        {normalGames.length === 0 ? (
           <div className="no-games">
             <p>No games played yet.</p>
           </div>
         ) : (
           <div className="games-list">
-            {sortedGames.map((game) => (
+            {normalGames.map((game) => (
               <div key={game.id} className="game-card">
                 <div className="game-header">
                   <div className="game-info">
@@ -143,6 +156,44 @@ export default function ProfileClient({
                 {game.correct_count >= game.targetCount && (
                   <div className="completion-time">
                     Completed {game.targetCount} items in {formatTime(game.time)}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="games-section">
+        <h2>Blitz Game History</h2>
+        {blitzGames.length === 0 ? (
+          <div className="no-games">
+            <p>No blitz games played yet.</p>
+          </div>
+        ) : (
+          <div className="games-list">
+            {blitzGames.map((game) => (
+              <div key={game.id} className="game-card">
+                <div className="game-header">
+                  <div className="game-info">
+                    <span className="profile-category-name">{findCategoryName(game.slug)}</span>
+                  </div>
+                </div>
+                
+                <div className="game-stats">
+                  <div className="game-stat">
+                    <span className="stat-value">{game.correct_count}</span>
+                    <span className="stat-name">Count</span>
+                  </div>
+                  <div className="game-stat">
+                    <span className="stat-value">{formatBlitzTime(game.difficultyId)}</span>
+                    <span className="stat-name">Time Limit</span>
+                  </div>
+                </div>
+
+                {game.correct_count >= game.targetCount && (
+                  <div className="completion-time">
+                    Completed {game.correct_count} items in {formatTime(findDifficulty(game.difficultyId).timeLimit)}
                   </div>
                 )}
               </div>

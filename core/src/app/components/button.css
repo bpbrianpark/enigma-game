@@ -2,10 +2,19 @@
     order: 1; 
 }
 
+.start-wrapper {
+    order: 1;
+}
 .restart-wrapper {
-    order: 2; 
+    order: 3; 
 }
 
+.leaderboard-wrapper {
+    order: 2;
+}
+
+.toggle-button,
+.start-button,
 .give-up-button,
 .restart-button {
     background: white;
@@ -46,6 +55,8 @@
     background: var(--font-white);
 }
 
+.toggle-button:hover,
+.start-button:hover,
 .give-up-button:hover,
 .restart-button:hover {
     transform: translateY(-1px);
@@ -54,12 +65,16 @@
     background: var(--font-white);
 }
 
+.toggle-button:active,
+.start-button:active,
 .give-up-button:active,
 .restart-button:active {
     transform: translateY(0);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
 }
 
+.toggle-button:disabled,
+.start-button:disabled,
 .give-up-button:disabled,
 .restart-button:disabled {
     opacity: 0.5;
@@ -70,6 +85,8 @@
     border-color: var(--font-white);
 }
 
+.toggle-button:disabled:hover,
+.start-button:disabled:hover,
 .give-up-button:disabled:hover,
 .restart-button:disabled:hover {
     transform: none;
