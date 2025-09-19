@@ -3,7 +3,7 @@
 import "./guess-input.css";
 import Fuse from "fuse.js";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { queryWDQS } from "../../../lib/wdqs";
 import { normalize } from "../../../lib/normalize";
 import { AliasType, CategoryType, EntryType, GuessInputProps } from "./types";
@@ -312,6 +312,7 @@ export default function GuessInput({
   const [inputValue, setInputValue] = useState("");
   const [showCorrectEffect, setShowCorrectEffect] = useState(false);
   const [showErrorEffect, setShowErrorEffect] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const triggerCorrectEffect = () => {
     setShowCorrectEffect(true);
@@ -333,6 +334,7 @@ export default function GuessInput({
         return;
       }
 
+      setLoading(true);
       const correctEntry = await checkGuess(
         category,
         inputValue,
@@ -355,6 +357,7 @@ export default function GuessInput({
         setInputValue("");
         triggerErrorEffect();
       }
+      setLoading(false);
     },
     [
       inputValue,
@@ -375,7 +378,12 @@ export default function GuessInput({
   };
 
   return (
+    <div className="guess-input-container">
+      <div className="spinner-wrapper">
+    {loading && <div className="spinner"></div>}
+  </div>
     <input
+      readOnly={loading}
       disabled={isGameCompleted || disabled}
       type="text"
       value={inputValue}
@@ -386,5 +394,6 @@ export default function GuessInput({
         showCorrectEffect ? "correct-fade" : ""
       }`}
     />
+  </div>
   );
 }
