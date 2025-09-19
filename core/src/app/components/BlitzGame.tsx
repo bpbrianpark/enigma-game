@@ -257,6 +257,7 @@ export default function BlitzGame({
           <GuessInput
             aliases={aliases}
             category={category}
+            disabled={!gameStarted}
             entries={entries}
             isDynamic={isDynamic}
             isGameCompleted={isGameCompleted}

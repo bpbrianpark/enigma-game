@@ -295,6 +295,7 @@ if (aliasFuzzyMatch) {
 export default function GuessInput({
   aliases,
   category,
+  disabled,
   entries,
   isDynamic,
   isGameCompleted,
@@ -375,7 +376,7 @@ export default function GuessInput({
 
   return (
     <input
-      disabled={isGameCompleted}
+      disabled={isGameCompleted || disabled}
       type="text"
       value={inputValue}
       onChange={(e) => setInputValue(e.target.value)}

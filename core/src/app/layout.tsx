@@ -6,6 +6,7 @@ import NavBar from "./components/NavBar";
 import Provider from "./components/Provider";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../lib/auth";
+import Footer from "./components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,7 @@ export default async function RootLayout({
         <Provider>
         <NavBar />
         {children}
+        <Footer />
         <Analytics />
         </Provider>
       </body>

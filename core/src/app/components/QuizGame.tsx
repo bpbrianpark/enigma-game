@@ -160,18 +160,6 @@ export default function QuizGame({
         selectedDifficulty) ||
       (givenUp && finalTime !== null && !!username)
     ) {
-      setShowFinishedIndicator(true);
-    }
-  }, [isTargetEntriesGuessed, finalTime, givenUp]);
-
-  useEffect(() => {
-    if (
-      (isTargetEntriesGuessed &&
-        finalTime !== null &&
-        !!username &&
-        selectedDifficulty) ||
-      (givenUp && finalTime !== null && !!username)
-    ) {
       postGameData(finalTime);
     }
   }, [
@@ -183,6 +171,13 @@ export default function QuizGame({
     showFinishedIndicator,
     postGameData,
   ]);
+
+
+  useEffect(() => {
+  if (isTargetEntriesGuessed || givenUp) {
+    setShowFinishedIndicator(true);
+  }
+}, [isTargetEntriesGuessed, givenUp]);
 
   return (
     <div className="quiz-container">

@@ -65,6 +65,7 @@ export interface DifficultyPickerProps {
 export interface GuessInputProps {
   aliases: Alias[];
   category: Category;
+  disabled: boolean;
   entries: Entry[];
   isDynamic: boolean;
   isGameCompleted: boolean;
