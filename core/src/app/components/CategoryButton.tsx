@@ -23,7 +23,7 @@ export default function CategoryButton({ slug, name }: CategoryButtonProps) {
     <div className="category-mode-options">
       <Link href={`${baseUrl}/quiz/${slug}`}>
         <div className="mode-button">
-          <h2 className="mode-text">Slow Burn</h2>
+          <h2 className="mode-text">Normal</h2>
         </div>
       </Link>
 

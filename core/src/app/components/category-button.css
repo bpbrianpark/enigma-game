@@ -32,4 +32,22 @@
     text-align: center;
 }
 
+.category-mode-options {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.mode-button {
+    width: 120px;
+    background-color: gray;
+    border-radius: 4px;
+}
+
+.mode-text {
+    justify-self: center;
+    color: var(--font-white);
+    font-weight: 1;
+    font-size: 14px;
+}
 
