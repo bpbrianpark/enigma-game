@@ -1,4 +1,4 @@
-import "./completed-dialog.css";
+import "./dialog.css";
 
 import React, { useState, useEffect } from "react";
 import { Copy, Check, X } from "lucide-react";

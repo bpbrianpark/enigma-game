@@ -97,7 +97,7 @@
 .stat-number {
   font-size: 2.5rem;
   font-weight: bold;
-  color: var(--color-quaternary);
+  color: var(--color-quarternary);
   margin-bottom: 0.5rem;
 }
 
@@ -167,7 +167,7 @@
 
 .profile-category-name {
   padding: 0.25rem 0.75rem;
-  background: var(--color-quaternary);
+  background: var(--color-quarternary);
   color: white;
   border-radius: 20px;
   font-size: 0.75rem;

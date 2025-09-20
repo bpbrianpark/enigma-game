@@ -13,7 +13,7 @@
 }
 
 .completed-dialog {
-  background: var(--font-dark);
+  background: var(--color-quarternary);
   border-radius: 8px;
   padding: 4%;
   height: fit-content;
@@ -62,6 +62,14 @@
   backdrop-filter: blur(10px);
 }
 
+.info-details {
+  background: var(--font-white);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  backdrop-filter: blur(10px);
+}
+
 .score-item {
   display: flex;
   justify-content: space-between;
@@ -70,13 +78,31 @@
   font-size: 1.1rem;
 }
 
+.info-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1rem 0;
+  font-size: 1.1rem;
+}
+
 .score-label {
   font-weight: 600;
+}
+
+.info-label {
+  font-weight: 600;
+  color: var(--font-dark)
 }
 
 .score-value {
   font-weight: bold;
   color: var(--yellow-bright);
+}
+
+.info-value {
+  color: var(--font-dark);
 }
 
 .copy-button {

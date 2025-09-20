@@ -19,7 +19,7 @@ function buildEntryMaps(entries: EntryType[]) {
     if (entry.norm) entryByNorm.set(entry.norm, entry);
     entryByNorm.set(normalize(entry.label), entry);
 
-    if (entry.url) entryByUrl.set(entry.url, entry);
+   if (entry.url) entryByUrl.set(entry.url, entry);
   }
 
   return { entryByNorm, entryByUrl };

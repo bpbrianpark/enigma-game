@@ -114,3 +114,9 @@ export interface CompletedDialogPropsType {
   isLoggedIn: boolean,
   gameType: string
 }
+
+export interface InfoDialogPropsType {
+  isOpen: boolean,
+  onClose: () => void,
+  gameType?: string
+}

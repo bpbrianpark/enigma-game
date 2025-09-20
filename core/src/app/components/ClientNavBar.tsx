@@ -6,6 +6,9 @@ import { useSession } from "next-auth/react";
 import SignOutButton from "./SignOutButton";
 import { Session } from "next-auth";
 import SignInButton from "./SignInButton";
+import InfoDialog from "./InfoDialog";
+import { useCallback, useState } from "react";
+import { CircleQuestionMark } from "lucide-react";
 
 interface ClientNavBarProps {
   initialSession: Session | null;
@@ -13,7 +16,7 @@ interface ClientNavBarProps {
 
 export default function ClientNavBar({ initialSession }: ClientNavBarProps) {
   const { data: session } = useSession();
-  
+  const [showInfoDialog, setShowInfoDialog] = useState(false);
   const currentSession = session ?? initialSession;
 
   const getUserInitials = (username: string) => {
@@ -25,6 +28,14 @@ export default function ClientNavBar({ initialSession }: ClientNavBarProps) {
       .slice(0, 2);
   };
 
+  const handleClickInfoButton = useCallback(() => {
+    setShowInfoDialog(true);
+  }, [showInfoDialog])
+
+  const handleCloseInfoDialog = useCallback(() => {
+    setShowInfoDialog(false);
+  }, [showInfoDialog])
+
   return (
     <div className="navbar-container">
       <nav className="navbar">
@@ -32,10 +43,13 @@ export default function ClientNavBar({ initialSession }: ClientNavBarProps) {
         <Link href="/">
           <img src="/home.svg" alt="Home" className="home-icon" />
           </Link></div>
-
           <div className="title-section">
             <h2>Knowington</h2>
           </div>
+          <div className="right-side-buttons">
+                  <div className="info-button" onClick={handleClickInfoButton}>
+            <CircleQuestionMark size={24}/>
+        </div>
         {currentSession?.user ? (
           <div className="navbar-user-section">
             <Link href={`/profile/${currentSession.user.username}`} className="profile-link">
@@ -57,7 +71,13 @@ export default function ClientNavBar({ initialSession }: ClientNavBarProps) {
         ) : (
           <SignInButton />
         )}
+        </div>
       </nav>
+
+      <InfoDialog
+        isOpen={showInfoDialog}
+        onClose={handleCloseInfoDialog}
+      />
     </div>
   );
 }

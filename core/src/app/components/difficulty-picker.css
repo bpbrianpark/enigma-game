@@ -35,12 +35,12 @@
 
 .difficulty-option:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border-color: var(--color-quaternary);
+    border-color: var(--color-quarternary);
 }
 
 .difficulty-option.selected {
-    border-color: var(--color-quaternary);
-    background: var(--color-quaternary);
+    border-color: var(--color-quarternary);
+    background: var(--color-quarternary);
     color: white;
     box-shadow: 0 4px 12px rgba(217, 162, 153, 0.3);
 }

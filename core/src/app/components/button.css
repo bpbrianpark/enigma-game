@@ -41,18 +41,8 @@
     font-weight: 500;
     padding: 0.5rem 1rem;
     border-radius: 6px;
-    transition: all 0.2s ease;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     text-decoration: none;
     letter-spacing: 0.25px;
-}
-
-.signin-button:hover,
-.signout-button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    border-color: var(--font-white);
-    background: var(--font-white);
 }
 
 .toggle-button:hover,
@@ -62,14 +52,14 @@
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     border-color: var(--font-white);
-    background: var(--font-white);
+    background: var(--color-quarternary);
 }
 
 .toggle-button:active,
 .start-button:active,
 .give-up-button:active,
 .restart-button:active {
-    transform: translateY(0);
+    background: var(--color-quarternary);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
 }
 
