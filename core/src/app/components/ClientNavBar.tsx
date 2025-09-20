@@ -44,7 +44,7 @@ export default function ClientNavBar({ initialSession }: ClientNavBarProps) {
           <img src="/home.svg" alt="Home" className="home-icon" />
           </Link></div>
           <div className="title-section">
-            <h2>Knowington</h2>
+            <h2>BlitzLister</h2>
           </div>
           <div className="right-side-buttons">
                   <div className="info-button" onClick={handleClickInfoButton}>
