@@ -1,14 +1,23 @@
+.leaderboard-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 1fr);
+    gap: 32px;
+    align-items: start;
+    width: 100%;
+    max-width: 1200px;
+    margin: 50px auto;
+    padding: 0 24px;
+}
+
 .leaderboard {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
-    max-width: 800px;
-    margin: 50px auto;
-    padding: 24px;
     background-color: var(--color-primary);
     border-radius: 8px;
     border: 2px solid var(--color-secondary);
+    padding: 24px;
 }
 
 .leaderboard-title {
@@ -95,9 +104,94 @@
   color: var(--font-dark);
 }
 
+.top-entries-panel {
+  background-color: var(--color-primary);
+  border: 2px solid var(--color-secondary);
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.top-entries-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.no-top-entries {
+  text-align: center;
+  color: var(--font-dark);
+  padding: 24px 0;
+}
+
+.top-entries-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+}
+
+.top-entry {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.top-entry-rank {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-accent);
+  width: 32px;
+  text-align: right;
+}
+
+.top-entry-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.top-entry-label {
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.top-entry-bar-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.top-entry-bar {
+  height: 10px;
+  border-radius: 4px;
+  background-color: var(--color-accent);
+  transition: width 0.3s ease;
+}
+
+.top-entry-count {
+  font-weight: 600;
+  color: var(--color-text);
+  min-width: 32px;
+  text-align: right;
+}
+
 @media (max-width: 768px) {
-  .leaderboard {
+  .leaderboard-grid {
+    grid-template-columns: 1fr;
     margin: 24px auto;
+    padding: 0 16px;
+  }
+
+  .leaderboard {
+    padding: 16px;
+  }
+
+  .top-entries-panel {
     padding: 16px;
   }
 

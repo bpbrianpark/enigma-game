@@ -18,6 +18,7 @@ export async function GET(req: NextRequest) {
     where: {
       slug,
       difficultyId,
+      username: { not: "GUEST" },
     },
     orderBy: [
       { correct_count: 'desc' },
@@ -37,13 +38,53 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { slug, difficultyId, time, targetCount, username, correct_count } = body
+    const {
+      slug,
+      difficultyId,
+      time,
+      targetCount,
+      username,
+      correct_count,
+    }: {
+      slug?: string;
+      difficultyId?: string;
+      time?: number;
+      targetCount?: number | null;
+      username?: string;
+      correct_count?: number;
+    } = body;
 
-    if (!slug || !difficultyId || !time || !targetCount || !username || !correct_count) {
+    console.log("[/api/games] Received submission", {
+      slug,
+      difficultyId,
+      username,
+      correct_count,
+      time,
+      targetCount,
+    });
+
+    if (
+      !slug ||
+      !difficultyId ||
+      correct_count === undefined ||
+      time === undefined ||
+      targetCount === undefined
+    ) {
       return NextResponse.json(
-        { error: "Missing required field."},
+        { error: "Missing required field." },
         { status: 400 }
-      )
+      );
+    }
+
+    if (!username) {
+      console.warn("[/api/games] Guest submission ignored for game persistence", {
+        slug,
+        difficultyId,
+      });
+      return NextResponse.json(
+        { ok: true, guest: true },
+        { status: 200 }
+      );
     }
 
     const game = await prisma.game.create({
@@ -53,14 +94,18 @@ export async function POST(req: NextRequest) {
         time,
         targetCount,
         username,
-        correct_count
-      }
+        correct_count,
+      },
     });
+
+    console.log("[/api/games] Game persisted", { gameId: game.id });
 
     return NextResponse.json(game, { status: 201 });
   } catch (e) {
+    console.error("[/api/games] Failed to persist game", e);
     return NextResponse.json({
-      message: 'Could not post game.', e
-    }, { status: 409 })
+      message: "Could not post game.",
+      error: e instanceof Error ? e.message : String(e),
+    });
   }
 }

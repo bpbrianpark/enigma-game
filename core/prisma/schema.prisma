@@ -62,6 +62,7 @@ model Entry {
   norm   String
   url    String @unique
   aliases Alias[]
+  count Int @default(0)
 
   @@index([categoryId, norm])
 }
@@ -88,6 +89,7 @@ model Game {
   targetCount Int?
   correct_count Int
   isBlitzGame Boolean?
+  entriesCounted Boolean @default(false)
 
   user  User  @relation(fields:[username],references:[username], onDelete: Cascade)
   category  Category  @relation(fields:[slug],references:[slug], onDelete:Cascade)

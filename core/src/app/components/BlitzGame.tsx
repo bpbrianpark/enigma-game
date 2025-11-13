@@ -1,7 +1,7 @@
 "use client";
 
 import "./quiz-game.css";
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import GuessInput from "./GuessInput";
@@ -42,6 +42,7 @@ export default function BlitzGame({
   const [shouldReset, setShouldReset] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
   const [showFinishedIndicator, setShowFinishedIndicator] = useState(false);
+  const hasPostedRef = useRef(false);
 
   const targetEntries = totalEntries;
   const timeLimit = 60000;
@@ -74,6 +75,7 @@ export default function BlitzGame({
     setIncorrectGuesses([]);
     setFinalTime(null);
     setShouldReset(true);
+    hasPostedRef.current = false;
   }, []);
 
   const handleIncorrectGuess = useCallback(
@@ -99,6 +101,7 @@ export default function BlitzGame({
     setFinalTime(null);
     setShouldReset(true);
     setGameStarted(false);
+    hasPostedRef.current = false;
   }, []);
 
   const handleTimerReset = useCallback(() => {
@@ -107,6 +110,10 @@ export default function BlitzGame({
 
   const handleTimeUp = useCallback(() => {
     setTimeUp(true);
+    if (!hasPostedRef.current) {
+      hasPostedRef.current = true;
+      postGameData(finalTime ?? undefined);
+    }
   }, []);
 
   const handleTimerUpdate = useCallback(
@@ -118,9 +125,13 @@ export default function BlitzGame({
         const elapsedTime = timeLimit - remainingTime;
         setFinalTime(elapsedTime);
         setShowFinishedIndicator(true);
+        if (!hasPostedRef.current) {
+          hasPostedRef.current = true;
+          postGameData(elapsedTime);
+        }
       }
     },
-    [givenUp, isTargetEntriesGuessed, finalTime, timeLimit]
+    [givenUp, isTargetEntriesGuessed, finalTime, timeLimit, postGameData]
   );
 
   const handleCloseCongratsDialog = useCallback(() => {
@@ -131,32 +142,61 @@ export default function BlitzGame({
     async (time?: number) => {
       console.log("Posting This: ", correctGuesses.length);
       if (correctGuesses.length === 0) return;
-      const gameData = {
-        username,
-        slug: slug,
-        difficultyId: selectedDifficulty?.id,
-        time: time,
-        targetCount: targetEntries,
-        correct_count: correctGuesses.length,
-        isBlitzGame: true,
+
+      const tallyPayload = {
+        slug,
+        entries: correctGuesses.map((entry) => ({
+          label: entry.label,
+          norm: entry.norm,
+          url: entry.url,
+        })),
       };
-      console.log(gameData);
+
+      if (username) {
+        const gameData = {
+          username,
+          slug: slug,
+          difficultyId: selectedDifficulty?.id,
+          time: time,
+          targetCount: targetEntries,
+          correct_count: correctGuesses.length,
+          isBlitzGame: true,
+        };
+        console.log(gameData);
+
+        try {
+          const response = await fetch(`/api/games`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(gameData),
+          });
+
+          if (!response.ok) {
+            console.error("Failed to save game data");
+            console.error(response);
+          }
+        } catch (e) {
+          console.log("Error posting game", e);
+        }
+      }
 
       try {
-        const response = await fetch(`/api/games`, {
+        const response = await fetch(`/api/entries/tally`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(gameData),
+          body: JSON.stringify(tallyPayload),
         });
 
         if (!response.ok) {
-          console.error("Failed to save game data");
+          console.error("Failed to tally entries");
           console.error(response);
         }
-      } catch (e) {
-        console.log("Error posting game", e);
+      } catch (error) {
+        console.error("Error posting tally payload", error);
       }
     },
     [username, slug, selectedDifficulty, targetEntries, correctGuesses]
@@ -172,7 +212,7 @@ export default function BlitzGame({
     ) {
       setShowFinishedIndicator(true);
     }
-  }, [isTargetEntriesGuessed, finalTime, givenUp]);
+  }, [isTargetEntriesGuessed, finalTime, givenUp, username, selectedDifficulty]);
 
   useEffect(() => {
     if (
@@ -183,7 +223,10 @@ export default function BlitzGame({
       (givenUp && finalTime !== null && !!username) ||
       (isGameCompleted && finalTime !== null && !!username)
     ) {
-      postGameData(finalTime);
+      if (!hasPostedRef.current) {
+        hasPostedRef.current = true;
+        postGameData(finalTime);
+      }
     }
   }, [
     isTargetEntriesGuessed,

@@ -28,6 +28,8 @@ export interface DifficultyType {
   categoryId: string;
   level: number;
   limit: number;
+  timeLimit: number | null;
+  name?: string;
 }
 
 export interface EntryType {
@@ -53,12 +55,13 @@ export interface GameType {
   time: number;
   targetCount: number;
   correct_count: number;
+  isBlitzGame?: boolean | null;
 }
 
 export interface DifficultyPickerProps {
-  difficulties: Difficulty[];
-  selectedDifficulty: Difficulty | null;
-  onDifficultyChange: (difficulty: Difficulty) => void;
+  difficulties: DifficultyType[];
+  selectedDifficulty: DifficultyType | null;
+  onDifficultyChange: (difficulty: DifficultyType) => void;
   disabled?: boolean;
 }
 

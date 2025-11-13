@@ -2,11 +2,12 @@
 
 import './leaderboard.css'
 
-import useSWR from "swr"
+import useSWR from "swr";
 import { useState, useMemo } from "react";
 import DifficultyPicker from "./DifficultyPicker";
-import { DifficultyType, GameType, LeaderboardPropsType } from './types';
-import Link from 'next/link';
+import { DifficultyType, GameType, LeaderboardPropsType } from "./types";
+import Link from "next/link";
+import { TopEntriesPanel } from "./TopEntriesPanel";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -19,7 +20,24 @@ function formatTime(milliseconds: number): string {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const fetcher = async (url: string) => {
+    const res = await fetch(url);
+    if (!res.ok) {
+        const body = await res.text();
+        const details = body ? safeJson(body) : undefined;
+        console.error("[Leaderboard] fetch failed", { url, status: res.status, body, details });
+        throw new Error(details?.error ?? details ?? body ?? `Request failed with status ${res.status}`);
+    }
+    return res.json();
+};
+
+function safeJson(raw: string) {
+    try {
+        return JSON.parse(raw);
+    } catch {
+        return undefined;
+    }
+}
 
 export default function Leaderboard({ category, difficulties, initialGames, slug }: LeaderboardPropsType) {
     const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyType | null>(
@@ -27,16 +45,42 @@ export default function Leaderboard({ category, difficulties, initialGames, slug
     );
     const [gameMode, setGameMode] = useState<'normal' | 'blitz'>('normal');
 
-    const { data: games = [] } = useSWR(`/api/games?slug=${slug}&difficultyId=${selectedDifficulty?.id}`, 
+    const { data: games = initialGames, error: gamesError } = useSWR(
+        `/api/games?slug=${slug}&difficultyId=${selectedDifficulty?.id}`,
         fetcher,
         {
-            keepPreviousData: true,   
-            revalidateOnFocus: false, 
-        });
+            keepPreviousData: true,
+            revalidateOnFocus: false,
+            fallbackData: initialGames,
+        }
+    );
+
+    const { data: topEntriesData, error: topEntriesError } = useSWR(
+        `/api/leaderboard/top-entries?slug=${slug}`,
+        fetcher,
+        {
+            keepPreviousData: true,
+            revalidateOnFocus: false,
+        }
+    );
+
+    const topEntries = Array.isArray(topEntriesData?.entries)
+        ? topEntriesData.entries
+        : [];
+
+    if (gamesError) {
+        console.error("[Leaderboard] Games request error", gamesError);
+    }
+
+    if (topEntriesError) {
+        console.error("[Leaderboard] Top entries request error", topEntriesError);
+    }
 
     const normalGames = useMemo(() => {
         if (!Array.isArray(games)) return [];
-        return games.filter((game: GameType) => game.isBlitzGame === null || game.isBlitzGame === undefined);
+        return games.filter(
+            (game: GameType) => game.isBlitzGame === null || game.isBlitzGame === undefined
+        );
     }, [games]);
 
     const blitzGames = useMemo(() => {
@@ -47,74 +91,76 @@ export default function Leaderboard({ category, difficulties, initialGames, slug
     const displayedGames = gameMode === 'blitz' ? blitzGames : normalGames;
 
     return (
-        <div className="leaderboard">
-            <h1 className="leaderboard-title">
-                {category.name}
-            </h1>
-            
-            <div className="leaderboard-controls">
-                <DifficultyPicker
-                    difficulties={difficulties}
-                    selectedDifficulty={selectedDifficulty}
-                    onDifficultyChange={setSelectedDifficulty}
-                />
-                
-                <div className="game-mode-toggle">
-                    <button 
-                        className={`toggle-button ${gameMode === 'normal' ? 'active' : ''}`}
-                        onClick={() => setGameMode('normal')}
-                    >
-                        Normal
-                    </button>
-                    <button 
-                        className={`toggle-button ${gameMode === 'blitz' ? 'active' : ''}`}
-                        onClick={() => setGameMode('blitz')}
-                    >
-                        Blitz
-                    </button>
+        <div className="leaderboard-grid">
+            <div className="leaderboard">
+                <h1 className="leaderboard-title">{category.name}</h1>
+
+                <div className="leaderboard-controls">
+                    <DifficultyPicker
+                        difficulties={difficulties}
+                        selectedDifficulty={selectedDifficulty}
+                        onDifficultyChange={setSelectedDifficulty}
+                    />
+
+                    <div className="game-mode-toggle">
+                        <button
+                            className={`toggle-button ${gameMode === 'normal' ? 'active' : ''}`}
+                            onClick={() => setGameMode('normal')}
+                        >
+                            Normal
+                        </button>
+                        <button
+                            className={`toggle-button ${gameMode === 'blitz' ? 'active' : ''}`}
+                            onClick={() => setGameMode('blitz')}
+                        >
+                            Blitz
+                        </button>
+                    </div>
                 </div>
+
+                {displayedGames.length === 0 ? (
+                    <div className="no-games-message">
+                        No {gameMode} games found for this difficulty.
+                    </div>
+                ) : (
+                    <table className="leaderboard-table">
+                        <thead>
+                            <tr className="table-headings">
+                                <th className="table-text">Rank</th>
+                                <th className="table-text">Player</th>
+                                <th className="table-text">Time</th>
+                                <th className="table-text">Correct Guesses</th>
+                                <th className="table-text">Targets</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {displayedGames.map((game: GameType, index: number) => (
+                                <tr key={game.id}>
+                                    <td className="rank" data-label="Rank">
+                                        {index + 1}
+                                    </td>
+                                    <td className="username" data-label="Player">
+                                        <Link href={`${baseUrl}/profile/${game.username}`}>
+                                            {game.username}
+                                        </Link>
+                                    </td>
+                                    <td className="time" data-label="Time">
+                                        {formatTime(game.time)}
+                                    </td>
+                                    <td className="totalcount" data-label="Correct">
+                                        {game.correct_count}
+                                    </td>
+                                    <td className="totalcount" data-label="Targets">
+                                        {game.targetCount}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
             </div>
 
-            {displayedGames.length === 0 ? (
-                <div className="no-games-message">
-                    No {gameMode} games found for this difficulty.
-                </div>
-            ) : (
-                <table className="leaderboard-table">
-                    <thead>
-                        <tr className="table-headings">
-                            <th className="table-text">Rank</th>
-                            <th className="table-text">Player</th>
-                            <th className="table-text">Time</th>
-                            <th className="table-text">Correct Guesses</th>
-                            <th className="table-text">Targets</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {displayedGames.map((game: GameType, index: number) => (
-                            <tr key={game.id}>
-                                <td className="rank" data-label="Rank">
-                                    {index + 1}
-                                </td>
-                                <td className="username" data-label="Player">
-                                    <Link href={`${baseUrl}/profile/${game.username}`}>
-                                    {game.username}
-                                    </Link>
-                                </td>
-                                <td className="time" data-label="Time">
-                                    {formatTime(game.time)}
-                                </td>
-                                <td className="totalcount" data-label="Correct">
-                                    {game.correct_count}
-                                </td>
-                                <td className="totalcount" data-label="Targets">
-                                    {game.targetCount}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            )}
+            <TopEntriesPanel entries={topEntries} />
         </div>
     );
 }

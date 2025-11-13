@@ -1,7 +1,7 @@
 "use client";
 
 import "./quiz-game.css";
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import GuessInput from "./GuessInput";
@@ -14,6 +14,29 @@ import Link from "next/link";
 import { DifficultyType, EntryType, QuizGameClientPropsType } from "./types";
 import LeaderboardButton from "./LeaderboardButton";
 import CompletedDialog from "./CompletedDialog";
+
+function resolveDifficultyName(difficulty?: DifficultyType | null): string {
+  if (!difficulty) {
+    return "Unknown";
+  }
+
+  if (difficulty.name) {
+    return difficulty.name;
+  }
+
+  switch (difficulty.level) {
+    case 1:
+      return "Easy";
+    case 2:
+      return "Medium";
+    case 3:
+      return "Hard";
+    case 4:
+      return "Extreme";
+    default:
+      return `Level ${difficulty.level}`;
+  }
+}
 
 export default function QuizGame({
   aliases,
@@ -28,9 +51,22 @@ export default function QuizGame({
   const { data: session, status } = useSession();
   const isLoggedIn = !!session;
   const router = useRouter();
+  const safeDifficulties = (difficulties ?? []) as DifficultyType[];
+  const safeEntries = entries ?? [];
+  const safeAliases = aliases ?? [];
+  const safeCategory = category;
+  const safeTotalEntries =
+    typeof totalEntries === "number" ? totalEntries : safeEntries.length;
+  const safeIsDynamic = Boolean(isDynamic);
+
+  if (!safeCategory) {
+    console.error("[QuizGame] Missing category data; unable to render");
+    return null;
+  }
+
   const [selectedDifficulty, setSelectedDifficulty] =
     useState<DifficultyType | null>(
-      difficulties.length > 0 ? difficulties[0] : null
+      safeDifficulties.length > 0 ? safeDifficulties[0] : null
     );
   const [correctGuesses, setCorrectGuesses] = useState<EntryType[]>([]);
   const [incorrectGuesses, setIncorrectGuesses] = useState<string[]>([]);
@@ -38,8 +74,9 @@ export default function QuizGame({
   const [givenUp, setGivenUp] = useState(false);
   const [shouldReset, setShouldReset] = useState(false);
   const [showFinishedIndicator, setShowFinishedIndicator] = useState(false);
+  const hasPostedRef = useRef(false);
 
-  const targetEntries = selectedDifficulty?.limit || totalEntries;
+  const targetEntries = selectedDifficulty?.limit || safeTotalEntries;
   const username = session?.user?.username;
 
   const isTargetEntriesGuessed = useMemo(() => {
@@ -87,6 +124,7 @@ export default function QuizGame({
   );
 
   const handleRestart = useCallback(() => {
+    hasPostedRef.current = false;
     setGivenUp(false);
     setShowFinishedIndicator(false);
     setCorrectGuesses([]);
@@ -99,6 +137,89 @@ export default function QuizGame({
     setShouldReset(false);
   }, []);
 
+  const handleCloseCongratsDialog = useCallback(() => {
+    setShowFinishedIndicator(false);
+  }, [showFinishedIndicator]);
+
+  const postGameData = useCallback(
+    async (time?: number) => {
+      console.log("Posting This: ", correctGuesses.length);
+      if (correctGuesses.length === 0) {
+        console.warn("[QuizGame] Skipping game post because there are no correct guesses", {
+          slug,
+          difficultyId: selectedDifficulty?.id,
+          time,
+          targetEntries,
+          givenUp,
+        });
+        return;
+      }
+
+      const tallyPayload = {
+        slug,
+        entries: correctGuesses.map((entry) => ({
+          label: entry.label,
+          norm: entry.norm,
+          url: entry.url,
+        })),
+      };
+
+      if (username) {
+        const gameData = {
+          username,
+          slug: slug,
+          difficultyId: selectedDifficulty?.id,
+          time: time,
+          targetCount: targetEntries,
+          correct_count: correctGuesses.length,
+        };
+
+        console.log("[QuizGame] Submitting game payload", gameData);
+
+        try {
+          const response = await fetch(`/api/games`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(gameData),
+          });
+
+          if (!response.ok) {
+            const text = await response.text();
+            console.error("[QuizGame] Failed to save game data", {
+              status: response.status,
+              body: text,
+            });
+          }
+        } catch (e) {
+          console.error("[QuizGame] Error posting game", e);
+        }
+      }
+
+      try {
+        const response = await fetch(`/api/entries/tally`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(tallyPayload),
+        });
+
+        if (!response.ok) {
+          const text = await response.text();
+          console.error("[QuizGame] Failed to tally entries", {
+            status: response.status,
+            body: text,
+          });
+        }
+      } catch (error) {
+        console.error("[QuizGame] Error posting tally payload", error);
+      }
+    },
+    [username, slug, selectedDifficulty, targetEntries, correctGuesses]
+  );
+
   const handleStopwatchUpdate = useCallback(
     (time: number) => {
       setFinalTime(time);
@@ -108,65 +229,30 @@ export default function QuizGame({
           console.log("Target Entries has been guessed.");
           setShowFinishedIndicator(true);
           console.log("Show Finished idnicator: ", showFinishedIndicator);
-          postGameData(time);
+          if (!hasPostedRef.current) {
+            hasPostedRef.current = true;
+            postGameData(time);
+          }
         }
       }
     },
-    [givenUp, isTargetEntriesGuessed, finalTime]
-  );
-
-  const handleCloseCongratsDialog = useCallback(() => {
-    setShowFinishedIndicator(false);
-  }, [showFinishedIndicator]);
-
-  const postGameData = useCallback(
-    async (time?: number) => {
-      console.log("Posting This: ", correctGuesses.length);
-      if (correctGuesses.length === 0) return;
-      const gameData = {
-        username,
-        slug: slug,
-        difficultyId: selectedDifficulty?.id,
-        time: time,
-        targetCount: targetEntries,
-        correct_count: correctGuesses.length,
-      };
-
-      try {
-        const response = await fetch(`/api/games`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(gameData),
-        });
-
-        if (!response.ok) {
-          console.error("Failed to save game data");
-          console.error(response);
-        }
-      } catch (e) {
-        console.log("Error posting game", e);
-      }
-    },
-    [username, slug, selectedDifficulty, targetEntries, correctGuesses]
+    [givenUp, isTargetEntriesGuessed, finalTime, postGameData]
   );
 
   useEffect(() => {
     if (
-      (isTargetEntriesGuessed &&
-        finalTime !== null &&
-        !!username &&
-        selectedDifficulty) ||
-      (givenUp && finalTime !== null && !!username)
+      (isTargetEntriesGuessed && finalTime !== null && selectedDifficulty) ||
+      (givenUp && finalTime !== null)
     ) {
-      postGameData(finalTime);
+      if (!hasPostedRef.current) {
+        hasPostedRef.current = true;
+        postGameData(finalTime);
+      }
     }
   }, [
     isTargetEntriesGuessed,
     finalTime,
     givenUp,
-    username,
     selectedDifficulty,
     showFinishedIndicator,
     postGameData,
@@ -184,14 +270,14 @@ export default function QuizGame({
       <div className="quiz-top-layer">
         <div className="difficulty-picker-container">
           <DifficultyPicker
-            difficulties={difficulties}
+            difficulties={safeDifficulties}
             selectedDifficulty={selectedDifficulty}
             onDifficultyChange={handleDifficultyChange}
             disabled={isTargetEntriesGuessed}
           ></DifficultyPicker>
         </div>
 
-        <div className="category-name">{category.name}</div>
+        <div className="category-name">{safeCategory.name}</div>
         <Stopwatch
           isRunning={!isGameCompleted}
           shouldReset={shouldReset}
@@ -245,10 +331,11 @@ export default function QuizGame({
       <div className="quiz-second-layer">
         {category && (
           <GuessInput
-            aliases={aliases}
-            category={category}
-            entries={entries}
-            isDynamic={isDynamic}
+            aliases={safeAliases}
+            category={safeCategory}
+            disabled={isGameCompleted}
+            entries={safeEntries}
+            isDynamic={safeIsDynamic}
             isGameCompleted={isGameCompleted}
             onCorrectGuess={handleCorrectGuess}
             onIncorrectGuess={handleIncorrectGuess}
@@ -267,11 +354,11 @@ export default function QuizGame({
       <CompletedDialog
         isOpen={showFinishedIndicator}
         onClose={handleCloseCongratsDialog}
-        finalTime={finalTime}
+        finalTime={finalTime ?? 0}
         correctGuesses={correctGuesses.length}
         targetEntries={targetEntries}
-        categoryName={category.name}
-        difficultyName={selectedDifficulty?.name}
+        categoryName={safeCategory.name}
+        difficultyName={resolveDifficultyName(selectedDifficulty)}
         isLoggedIn={isLoggedIn}
         gameType={"Normal"}
       />

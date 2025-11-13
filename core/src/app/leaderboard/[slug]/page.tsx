@@ -27,7 +27,7 @@ export default async function LeaderboardPage({
   const initialGames = await prisma.game.findMany({
     where: {
       slug: slug,
-      difficultyId: category.difficulties[0]?.id
+      difficultyId: category.difficulties[0]?.id,
     },
     orderBy: [
       { correct_count: 'desc' },
