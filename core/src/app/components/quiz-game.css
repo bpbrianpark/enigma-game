@@ -12,6 +12,14 @@
   gap: 2rem;
 }
 
+@media (max-width: 768px) {
+  .quiz-container {
+    padding: 16px 16px 32px;
+    min-height: auto;
+    gap: 1.5rem;
+  }
+}
+
 .quiz-top-layer {
   flex-grow: 0;
   flex-shrink: 0;
@@ -37,6 +45,15 @@
   width: 100%;
 }
 
+@media (max-width: 768px) {
+  .quiz-second-layer {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    padding: 0 16px;
+  }
+}
+
 .progress-text {
   flex-grow: 0;
   flex-shrink: 0;
@@ -59,12 +76,30 @@
   font-weight: bold;
 }
 
+@media (max-width: 768px) {
+  .category-name {
+    font-size: 20px;
+    padding: 0 16px;
+  }
+}
+
 .give-up-restart-button-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 35%;
   flex-direction: row;
+}
+
+@media (max-width: 768px) {
+  .give-up-restart-button-container {
+    width: 100%;
+    max-width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0 16px;
+    justify-content: center;
+  }
 }
 
 .completed-game-message-container {
@@ -81,6 +116,17 @@
   text-align: center;
   color: var(--font-dark);
   font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .completed-game-message {
+    font-size: 18px;
+    padding: 0 16px;
+  }
+
+  .completed-game-message-container {
+    padding: 0 16px;
+  }
 }
 
 .difficulty-picker-container {
@@ -109,4 +155,19 @@
 
 .not-logged-in-link:hover {
   color: var(--success-color-light);
+}
+
+@media (max-width: 768px) {
+  .not-logged-in-container {
+    margin: 10px 16px;
+    padding: 10px;
+  }
+
+  .not-logged-in-text {
+    font-size: 13px;
+  }
+
+  .progress-text {
+    font-size: 14px;
+  }
 }

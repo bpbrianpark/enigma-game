@@ -40,18 +40,22 @@ export default function ClientNavBar({ initialSession }: ClientNavBarProps) {
     <div className="navbar-container">
       <nav className="navbar">
         <div className="home-section">
-        <Link href="/">
-          <img src="/igloologoonly.png" alt="Home" className="home-icon" />
-          </Link></div>
+          <Link href="/" className="home-icon-link">
+            <img src="/igloologoonly.png" alt="Home" className="home-icon" />
+          </Link>
+          <div className="info-button-mobile" onClick={handleClickInfoButton}>
+            <CircleQuestionMark size={24}/>
+          </div>
+        </div>
           <div className="title-section">
             <Link href="/">
               <img src="/fullnamelogo.png" alt="Bungalow" className="navbar-logo" />
             </Link>
           </div>
           <div className="right-side-buttons">
-                  <div className="info-button" onClick={handleClickInfoButton}>
-            <CircleQuestionMark size={24}/>
-        </div>
+            <div className="info-button-desktop" onClick={handleClickInfoButton}>
+              <CircleQuestionMark size={24}/>
+            </div>
         {currentSession?.user ? (
           <div className="navbar-user-section">
             <Link href={`/profile/${currentSession.user.username}`} className="profile-link">

@@ -63,3 +63,23 @@
 .difficulty-option.selected .difficulty-limit {
     opacity: 0.9;
 }
+
+@media (max-width: 768px) {
+  .difficulty-picker {
+    width: 100%;
+    padding: 0 16px;
+  }
+
+  .difficulty-options {
+    gap: 8px;
+  }
+
+  .difficulty-option {
+    padding: 0.625rem 1rem;
+    font-size: 0.8125rem;
+  }
+
+  .difficulty-limit {
+    font-size: 0.6875rem;
+  }
+}

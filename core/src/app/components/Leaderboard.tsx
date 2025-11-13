@@ -93,21 +93,21 @@ export default function Leaderboard({ category, difficulties, initialGames, slug
                     <tbody>
                         {displayedGames.map((game: GameType, index: number) => (
                             <tr key={game.id}>
-                                <td className="rank">
+                                <td className="rank" data-label="Rank">
                                     {index + 1}
                                 </td>
-                                <td className="username">
+                                <td className="username" data-label="Player">
                                     <Link href={`${baseUrl}/profile/${game.username}`}>
                                     {game.username}
                                     </Link>
                                 </td>
-                                <td className="time">
+                                <td className="time" data-label="Time">
                                     {formatTime(game.time)}
                                 </td>
-                                <td className="totalcount">
+                                <td className="totalcount" data-label="Correct">
                                     {game.correct_count}
                                 </td>
-                                <td className="totalcount">
+                                <td className="totalcount" data-label="Targets">
                                     {game.targetCount}
                                 </td>
                             </tr>

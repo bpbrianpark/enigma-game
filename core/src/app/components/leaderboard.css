@@ -94,3 +94,85 @@
   padding: 40px;
   color: var(--font-dark);
 }
+
+@media (max-width: 768px) {
+  .leaderboard {
+    margin: 24px auto;
+    padding: 16px;
+  }
+
+  .leaderboard-title {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+
+  .leaderboard-table {
+    font-size: 14px;
+    overflow-x: auto;
+    display: block;
+  }
+
+  .leaderboard-table thead,
+  .leaderboard-table tbody,
+  .leaderboard-table tr {
+    display: block;
+  }
+
+  .leaderboard-table thead {
+    display: none;
+  }
+
+  .leaderboard-table tr {
+    margin-bottom: 12px;
+    border: 2px solid var(--color-secondary);
+    border-radius: 6px;
+    padding: 12px;
+    background: var(--color-primary);
+  }
+
+  .leaderboard-table td {
+    display: block;
+    text-align: left;
+    padding: 8px 0;
+    border-bottom: none;
+    position: relative;
+    padding-left: 40%;
+  }
+
+  .leaderboard-table td:before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 35%;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .username {
+    padding-left: 0;
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .username:before {
+    display: none;
+  }
+
+  .time,
+  .totalcount {
+    padding-left: 0;
+  }
+
+  .time:before {
+    content: "Time: ";
+  }
+
+  .totalcount:before {
+    content: "Total: ";
+  }
+
+  .leaderboard-controls {
+    gap: 16px;
+  }
+}

@@ -26,6 +26,8 @@ body {
     margin: 0;
     font-family: var(--font-main);
     color: var(--color-text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 
@@ -33,6 +35,13 @@ body {
 main {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 16px;
+}
+
+@media (min-width: 769px) {
+    main {
+        padding: 0 24px;
+    }
 }
 
 .categories-container {
@@ -77,7 +86,7 @@ main {
 
 @media (max-width: 768px) {
     .categories-container {
-        padding: 0 16px 32px;
+        padding: 0 0px 32px;
     }
 
     .categories-title {

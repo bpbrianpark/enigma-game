@@ -7,3 +7,16 @@
     justify-self: center;
     font-weight: 500;
 }
+
+@media (max-width: 768px) {
+  .stopwatch-time {
+    font-size: 64px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .stopwatch-time {
+    font-size: 48px;
+  }
+}

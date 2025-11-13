@@ -13,6 +13,27 @@
   justify-content: space-between;
 }
 
+@media (max-width: 768px) {
+  .footer-bar {
+    flex-direction: column;
+    gap: 24px;
+    padding: 24px 16px;
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .copyright-disclaimer {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .links-section {
+    margin-right: 0;
+    width: 100%;
+    height: auto;
+  }
+}
+
 .home-icon {
     width: 32px;
     height: 32px;

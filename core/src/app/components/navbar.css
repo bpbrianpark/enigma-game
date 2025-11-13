@@ -16,10 +16,45 @@
   height: 100%;
 }
 
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0px 16px;
+  }
+}
+
 .home-section {
     display: flex;
     align-items: center;
     flex: 1;
+    gap: 12px;
+}
+
+.home-icon-link {
+    display: flex;
+    align-items: center;
+}
+
+.info-button-mobile {
+    display: none;
+}
+
+.info-button-desktop {
+    display: flex;
+    width: 24px;
+    height: 24px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 10px;
+    box-sizing: border-box;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text);
+    transition: opacity 0.2s ease;
+}
+
+.info-button-desktop:hover {
+    opacity: 0.8;
 }
 
 .title-section {
@@ -46,6 +81,13 @@
     width: 24px;
     height: 24px;
     cursor: pointer;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 .right-side-buttons {
@@ -111,4 +153,72 @@
     font-weight: 600;
     color: var(--font-dark);
     letter-spacing: 0.25px;
+}
+
+@media (max-width: 768px) {
+  .navbar-title {
+    font-size: 1.25rem;
+  }
+
+  .navbar-logo {
+    height: 36px;
+  }
+
+  .navbar-username {
+    display: none;
+  }
+
+  .right-side-buttons {
+    gap: 12px;
+  }
+
+  .home-icon {
+    display: none;
+  }
+
+  .info-button-mobile {
+    display: flex;
+    width: 24px;
+    height: 24px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 10px;
+    box-sizing: border-box;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text);
+    transition: opacity 0.2s ease;
+  }
+
+  .info-button-mobile:hover {
+    opacity: 0.8;
+  }
+
+  .info-button-desktop {
+    display: none;
+  }
+
+  .navbar-profile-circle {
+    width: 32px;
+    height: 32px;
+  }
+
+  .navbar-profile-initials {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0px 12px;
+  }
+
+  .navbar-title {
+    font-size: 1.1rem;
+  }
+
+  .right-side-buttons {
+    gap: 8px;
+  }
 }

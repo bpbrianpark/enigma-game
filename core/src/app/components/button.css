@@ -111,3 +111,22 @@
   background: var(--color-accent);
   color: white;
 }
+
+@media (max-width: 768px) {
+  .toggle-button,
+  .start-button,
+  .give-up-button,
+  .restart-button,
+  .leaderboard-button {
+    padding: 0.875rem 1.25rem;
+    font-size: 0.875rem;
+    min-height: 44px;
+  }
+
+  .signin-button,
+  .signout-button {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.75rem;
+    min-height: 44px;
+  }
+}

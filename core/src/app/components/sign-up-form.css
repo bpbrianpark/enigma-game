@@ -136,6 +136,11 @@ form {
     padding: 0.5rem;
     border-radius: 8px;
     transition: background-color 0.2s ease;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .exit-icon-container:hover {
@@ -170,4 +175,38 @@ form {
 .auth-links a:hover {
     color: var(--success-color-light);
     text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .sign-in-dialog,
+  .register-dialog {
+    width: 100%;
+    min-height: auto;
+    margin-top: 0;
+    border-radius: 16px 16px 0 0;
+  }
+
+  form {
+    padding: 2rem 1.5rem;
+    gap: 1.25rem;
+  }
+
+  .enter-username-text {
+    font-size: 1.5rem;
+  }
+
+  .register-input {
+    height: 52px;
+    font-size: 16px;
+  }
+
+  .register-submit-btn {
+    height: 52px;
+    font-size: 1rem;
+  }
+
+  .exit-icon-container {
+    top: 0.75rem;
+    right: 0.75rem;
+  }
 }

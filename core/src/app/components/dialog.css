@@ -28,6 +28,57 @@
   overflow: hidden;
 }
 
+@media (max-width: 768px) {
+  .dialog-overlay {
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    right: none !important;
+  }
+
+  .completed-dialog {
+    max-width: calc(100% - 32px);
+    margin: 16px;
+    padding: 24px 20px;
+    border-radius: 16px;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+  }
+
+  .info-dialog {
+    max-width: calc(100% - 32px);
+    margin: 16px auto;
+    border-radius: 16px;
+    width: 100vw;
+    height: 80vh;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    margin-bottom: 25%
+  }
+
+  .congrats-title {
+    font-size: 24px;
+  }
+
+  .score-details,
+  .info-details {
+    padding: 16px;
+    margin: 16px 0;
+  }
+
+  .score-item,
+  .info-item {
+    font-size: 1rem;
+    margin: 0.6rem 0;
+  }
+
+  .copy-button {
+    width: 100%;
+    padding: 14px 24px;
+  }
+}
+
 .close-button {
   position: absolute;
   z-index: 1;
@@ -38,12 +89,16 @@
   border-radius: 50%;
   width: 32px;
   height: 32px;
+  min-width: 44px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: var(--color-text);
   transition: background-color 0.2s, border-color 0.2s;
+  padding: 6px;
+  box-sizing: border-box;
 }
 
 .close-button:hover {
@@ -193,5 +248,241 @@
   100% {
     transform: translateY(100vh) translateX(var(--end-x, 0)) rotate(360deg);
     opacity: 0;
+  }
+}
+
+/* Info Dialog Styles */
+.info-dialog {
+  background: var(--color-primary);
+  border-radius: 12px;
+  padding: 0;
+  height: fit-content;
+  max-width: 600px;
+  width: 100%;
+  position: relative;
+  color: var(--color-text);
+  border: 2px solid var(--color-secondary);
+  box-shadow: var(--shadow-elevated);
+  animation: slideInScale 0.3s ease-out;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+}
+
+.info-dialog-header {
+  padding: 32px 32px 24px;
+  text-align: center;
+  border-bottom: 2px solid var(--color-secondary);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+}
+
+.info-dialog-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+}
+
+.info-dialog-subtitle {
+  font-size: 16px;
+  color: var(--color-text);
+  opacity: 0.7;
+  margin: 0;
+}
+
+.info-dialog-content {
+  padding: 32px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.info-step {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 32px;
+  align-items: flex-start;
+}
+
+.info-step:last-child {
+  margin-bottom: 0;
+}
+
+.info-step-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 2px 8px rgba(65, 184, 213, 0.3);
+}
+
+.info-step-content {
+  flex: 1;
+}
+
+.info-step-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 8px 0;
+}
+
+.info-step-description {
+  font-size: 15px;
+  color: var(--color-text);
+  opacity: 0.8;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.info-mode-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.info-mode-card {
+  background: var(--color-secondary);
+  border-radius: 8px;
+  padding: 16px;
+  border: 2px solid var(--color-secondary);
+  transition: all 0.2s ease;
+}
+
+.info-mode-card:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(65, 184, 213, 0.15);
+}
+
+.info-mode-header {
+  margin-bottom: 12px;
+}
+
+.info-mode-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-mode-badge.normal {
+  background: var(--color-accent);
+  color: white;
+}
+
+.info-mode-badge.blitz {
+  background: var(--color-secondary);
+  color: var(--color-text);
+  border: 2px solid var(--color-accent);
+}
+
+.info-mode-description {
+  font-size: 14px;
+  color: var(--color-text);
+  opacity: 0.85;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.info-dialog-footer {
+  padding: 24px 32px;
+  border-top: 2px solid var(--color-secondary);
+  display: flex;
+  justify-content: center;
+  background: var(--color-primary);
+}
+
+.info-dialog-close-btn {
+  background: var(--color-accent);
+  border: 2px solid var(--color-accent);
+  border-radius: 8px;
+  padding: 14px 48px;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.info-dialog-close-btn:hover {
+  background: var(--success-color-light);
+  border-color: var(--success-color-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(63, 114, 175, 0.3);
+}
+
+.info-dialog-close-btn:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .info-dialog-header {
+    padding: 24px 20px 20px;
+  }
+
+  .info-dialog-title {
+    font-size: 26px;
+  }
+
+  .info-dialog-subtitle {
+    font-size: 14px;
+  }
+
+  .info-dialog-content {
+    padding: 24px 20px;
+  }
+
+  .info-step {
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .info-step-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .info-step-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .info-step-title {
+    font-size: 18px;
+  }
+
+  .info-step-description {
+    font-size: 14px;
+  }
+
+  .info-mode-section {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .info-mode-card {
+    padding: 14px;
+  }
+
+  .info-dialog-footer {
+    padding: 20px;
+  }
+
+  .info-dialog-close-btn {
+    width: 100%;
+    padding: 14px 24px;
   }
 }

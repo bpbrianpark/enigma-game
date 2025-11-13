@@ -80,16 +80,21 @@
 
 @media (max-width: 768px) {
   .hero-section {
-    padding: 60px 0;
+    padding: 48px 0;
     margin-bottom: 32px;
   }
 
+  .hero-content {
+    padding: 0 16px;
+  }
+
   .hero-title {
-    font-size: 36px;
+    font-size: 32px;
   }
 
   .hero-subtitle {
-    font-size: 18px;
+    font-size: 16px;
+    padding: 0 8px;
   }
 
   .hero-cta {
@@ -100,6 +105,21 @@
   .hero-button {
     width: 100%;
     max-width: 280px;
+    padding: 12px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section {
+    padding: 40px 0;
+  }
+
+  .hero-title {
+    font-size: 28px;
+  }
+
+  .hero-subtitle {
+    font-size: 15px;
   }
 }
 

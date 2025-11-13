@@ -7,6 +7,14 @@
     justify-content: center;
 }
 
+@media (max-width: 768px) {
+  .quiz-table {
+    flex-direction: column;
+    gap: 24px;
+    padding: 0 16px;
+  }
+}
+
 .guesses-column {
     display: flex; 
     flex-direction: column; 
@@ -14,6 +22,12 @@
     align-items: center; 
     width: 40%;
     position: relative; 
+}
+
+@media (max-width: 768px) {
+  .guesses-column {
+    width: 100%;
+  }
 }
 
 .correct-guesses-header {
@@ -109,4 +123,26 @@
     align-items: center;
     font-weight: 500;
     border: 1px solid var(--color-secondary);
+}
+
+@media (max-width: 768px) {
+  .correct-guesses-header,
+  .incorrect-guesses-header {
+    width: 100%;
+    font-size: 14px;
+  }
+
+  .guesses {
+    width: 100%;
+  }
+
+  .guess-list {
+    padding: 12px;
+  }
+
+  .correct-guess-text,
+  .incorrect-guess-text {
+    padding: 10px;
+    font-size: 14px;
+  }
 }
