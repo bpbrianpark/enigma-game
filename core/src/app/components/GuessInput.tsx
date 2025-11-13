@@ -3,7 +3,7 @@
 import "./guess-input.css";
 import Fuse from "fuse.js";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { queryWDQS } from "../../../lib/wdqs";
 import { normalize } from "../../../lib/normalize";
 import { AliasType, CategoryType, EntryType, GuessInputProps } from "./types";
@@ -11,103 +11,8 @@ import { AliasType, CategoryType, EntryType, GuessInputProps } from "./types";
 const FUZZY_THRESHOLD = 0.1;
 const LENGTH_DIFF_THRESHOLD = 3;
 
-function buildEntryMaps(entries: EntryType[]) {
-  const entryByNorm = new Map<string, EntryType>();
-  const entryByUrl = new Map<string, EntryType>();
-
-  for (const entry of entries) {
-    if (entry.norm) entryByNorm.set(entry.norm, entry);
-    entryByNorm.set(normalize(entry.label), entry);
-
-   if (entry.url) entryByUrl.set(entry.url, entry);
-  }
-
-  return { entryByNorm, entryByUrl };
-}
-
-function buildAliasHashMap(aliases: AliasType[]): Map<string, AliasType> {
-  const hashMap = new Map<string, AliasType>();
-
-  for (const alias of aliases) {
-    if (alias.norm) {
-      hashMap.set(alias.norm, alias);
-    }
-
-    hashMap.set(normalize(alias.label), alias);
-  }
-
-  return hashMap;
-}
-
 function buildCategoryQuery(updateSparql: string, guess: string): string {
   return updateSparql.replace("SEARCH_TERM", `${guess}`);
-}
-
-async function insertAlias(
-  alias: string,
-  guess: string,
-  normalizedGuess: string,
-  category: CategoryType,
-  aliasHashMap: Map<string, AliasType>,
-  entry: EntryType
-): Promise<EntryType | null> {
-  if (normalize(alias) != normalizedGuess) {
-    return null
-  }
-  try {
-    const res = await fetch(`/api/categories/${category.slug}/aliases`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        categoryId: category.id,
-        entryId: entry.id,
-        label: guess,
-        norm: normalizedGuess,
-      }),
-    });
-
-    if (res.ok) {
-      const alias: AliasType = await res.json();
-      if (alias.norm) aliasHashMap.set(alias.norm, alias);
-      return entry;
-    }
-  } catch (e) {
-    console.error("Failed to insert alias", e);
-  }
-  return null;
-}
-
-async function insertNewEntry(
-  category: CategoryType,
-  label: string,
-  normalizedLabel: string,
-  url: string,
-  entryByNorm: Map<string, EntryType>,
-  entryByUrl: Map<string, EntryType>
-): Promise<EntryType | null> {
-  try {
-    const res = await fetch(`/api/categories/${category.slug}/entries`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        categoryId: category.id,
-        label,
-        norm: normalizedLabel,
-        url,
-      }),
-    });
-
-    if (res.ok) {
-      const entry: EntryType = await res.json();
-      if (entry.norm) entryByNorm.set(entry.norm, entry);
-      entryByNorm.set(normalize(entry.label), entry);
-      if (entry.url) entryByUrl.set(entry.url, entry);
-      return entry;
-    }
-  } catch (err) {
-    console.error("Failed to insert entry via API:", err);
-  }
-  return null;
 }
 
 async function handleBinding(
@@ -128,37 +33,76 @@ async function handleBinding(
   const normalizedLabel = normalize(label);
 
   // If alias exists, check if label and alias is within threshold
-  // If alias doesn't exist, only check if label is within threshold
+  // If not, only check if label is within threshold
   let normalizedAlias;
-  if (alias) { 
+  if (alias) {
     normalizedAlias = normalize(alias);
-    
-    if ((Math.abs(normalizedLabel.length - guess.length) > LENGTH_DIFF_THRESHOLD)
-   && (Math.abs(normalizedAlias.length - guess.length) > LENGTH_DIFF_THRESHOLD)) {
-    return null;
-  }
+
+    if (
+      Math.abs(normalizedLabel.length - normalizedGuess.length) >
+        LENGTH_DIFF_THRESHOLD &&
+      Math.abs(normalizedAlias.length - normalizedGuess.length) >
+        LENGTH_DIFF_THRESHOLD
+    ) {
+      return null;
+    }
   } else {
-    if ((Math.abs(normalizedLabel.length - guess.length) > LENGTH_DIFF_THRESHOLD)) {
+    if (
+      Math.abs(normalizedLabel.length - normalizedGuess.length) >
+      LENGTH_DIFF_THRESHOLD
+    ) {
       return null;
     }
   }
 
-  // Insert alias if the entry already exists in the DB
-  if (entryByUrl.has(url)) {
-    return await insertAlias(
-      alias,
-      guess,
-      normalizedGuess,
-      category,
-      aliasHashMap,
-      entryByUrl.get(url)!
-    );
+  // Check if the guess matches the label or alias
+  const matchesLabel = normalizedLabel === normalizedGuess;
+  const matchesAlias = alias && normalizedAlias === normalizedGuess;
+
+  if (!matchesLabel && !matchesAlias) {
+    return null;
   }
 
-  // Return null if the entry's alias doesn't match the given alias
-  return await insertNewEntry(category, label, normalizedLabel, url, entryByNorm, entryByUrl);
-}
+  // Check if entry already exists in maps (from previous guesses in this session)
+  if (entryByUrl.has(url)) {
+    const existingEntry = entryByUrl.get(url)!;
+    // Update maps with the alias if it matches
+    if (matchesAlias && normalizedAlias) {
+      aliasHashMap.set(normalizedAlias, {
+        id: `temp-alias-${Date.now()}-${Math.random()}`,
+        entryId: existingEntry.id,
+        label: alias,
+        norm: normalizedAlias,
+      });
+    }
+    return existingEntry;
+  }
 
+  // Create new EntryType object without posting to database
+  const newEntry: EntryType = {
+    id: `temp-entry-${Date.now()}-${Math.random()}`,
+    categoryId: category.id,
+    label: label,
+    norm: normalizedLabel,
+    url: url,
+  };
+
+  // Update maps for potential future lookups in this session
+  entryByNorm.set(normalizedLabel, newEntry);
+  entryByUrl.set(url, newEntry);
+
+  // If alias matches, also add it to the alias map
+  if (matchesAlias && normalizedAlias) {
+    aliasHashMap.set(normalizedAlias, {
+      id: `temp-alias-${Date.now()}-${Math.random()}`,
+      entryId: newEntry.id,
+      label: alias,
+      norm: normalizedAlias,
+    });
+  }
+
+  return newEntry;
+}
 
 async function checkAndInsertDynamic(
   aliasHashMap: Map<string, AliasType>,
@@ -175,9 +119,11 @@ async function checkAndInsertDynamic(
   if (data.results.bindings.length === 0) return null;
 
   const normalizedGuess = normalize(guess);
-  console.log("Bindings: ", data.results.bindings)
-  for (const binding of data.results.bindings) {
-    const entry = await handleBinding(
+  console.log("Bindings: ", data.results.bindings);
+
+  // Process bindings in parallel and return first successful match
+  const bindingPromises = data.results.bindings.map((binding: any) =>
+    handleBinding(
       binding,
       guess,
       normalizedGuess,
@@ -185,20 +131,26 @@ async function checkAndInsertDynamic(
       aliasHashMap,
       entryByNorm,
       entryByUrl
-    );
-    if (entry) return entry;
+    )
+  );
+
+  const results = await Promise.allSettled(bindingPromises);
+
+  for (const result of results) {
+    if (result.status === "fulfilled" && result.value) {
+      return result.value;
+    }
   }
 
   return null;
 }
 
-
-function fuzzySearch(entries: EntryType[], guess: string): EntryType | null {
-  const fuse = new Fuse(entries, {
-    keys: ["label", "norm"],
-    threshold: FUZZY_THRESHOLD,
-    includeScore: true,
-  });
+function fuzzySearch<T extends { norm: string }>(
+  fuse: Fuse<T>,
+  guess: string,
+  normalizedGuess: string
+): T | null {
+  if (normalizedGuess.length === 0) return null;
 
   const results = fuse.search(guess);
 
@@ -206,29 +158,7 @@ function fuzzySearch(entries: EntryType[], guess: string): EntryType | null {
     results.length > 0 &&
     results[0].score &&
     results[0].score < FUZZY_THRESHOLD &&
-    Math.abs(results[0].item.norm.length - guess.length) <=
-      LENGTH_DIFF_THRESHOLD
-  ) {
-    return results[0].item;
-  }
-
-  return null;
-}
-
-function fuzzySearchAlias(aliases: AliasType[], guess: string): AliasType | null {
-  const fuse = new Fuse(aliases, {
-    keys: ["label", "norm"],
-    threshold: FUZZY_THRESHOLD,
-    includeScore: true,
-  });
-
-  const results = fuse.search(guess);
-
-  if (
-    results.length > 0 &&
-    results[0].score &&
-    results[0].score < FUZZY_THRESHOLD &&
-    Math.abs(results[0].item.norm.length - guess.length) <=
+    Math.abs(results[0].item.norm.length - normalizedGuess.length) <=
       LENGTH_DIFF_THRESHOLD
   ) {
     return results[0].item;
@@ -240,40 +170,43 @@ function fuzzySearchAlias(aliases: AliasType[], guess: string): AliasType | null
 async function checkGuess(
   category: CategoryType,
   guess: string,
-  aliases: AliasType[],
   aliasHashMap: Map<string, AliasType>,
   entryByNorm: Map<string, EntryType>,
   entryByUrl: Map<string, EntryType>,
-  entries: EntryType[],
+  entriesFuse: Fuse<EntryType>,
+  aliasesFuse: Fuse<AliasType>,
+  entryById: Map<string, EntryType>,
   isDynamic: boolean
 ): Promise<EntryType | null> {
   const normalizedGuess = normalize(guess);
+
+  if (normalizedGuess.length === 0) return null;
 
   const correspondingEntry = entryByNorm.get(normalizedGuess) || null;
   if (correspondingEntry) {
     return correspondingEntry;
   }
 
-  const fuzzyMatch = fuzzySearch(entries, guess);
+  const fuzzyMatch = fuzzySearch(entriesFuse, guess, normalizedGuess);
   if (fuzzyMatch) {
     return fuzzyMatch;
   }
 
-const correspondingAlias = aliasHashMap.get(normalizedGuess) || null;
-if (correspondingAlias) {
-  const entry = entries.find((e) => e.id === correspondingAlias.entryId) || null;
-  if (entry) {
-    return entry;
+  const correspondingAlias = aliasHashMap.get(normalizedGuess) || null;
+  if (correspondingAlias) {
+    const entry = entryById.get(correspondingAlias.entryId) || null;
+    if (entry) {
+      return entry;
+    }
   }
-}
 
-const aliasFuzzyMatch = fuzzySearchAlias(aliases, guess);
-if (aliasFuzzyMatch) {
-  const entry = entries.find((e) => e.id === aliasFuzzyMatch.entryId) || null;
-  if (entry) {
-    return entry;
+  const aliasFuzzyMatch = fuzzySearch(aliasesFuse, guess, normalizedGuess);
+  if (aliasFuzzyMatch) {
+    const entry = entryById.get(aliasFuzzyMatch.entryId) || null;
+    if (entry) {
+      return entry;
+    }
   }
-}
 
   if (isDynamic) {
     const verifiedEntry = await checkAndInsertDynamic(
@@ -302,13 +235,30 @@ export default function GuessInput({
   onCorrectGuess,
   onIncorrectGuess,
 }: GuessInputProps) {
-  const { entryByNorm, entryByUrl } = useMemo(() => {
-  return buildEntryMaps(entries);
-}, [entries]);
+  const entryByNorm = useMemo(() => new Map<string, EntryType>(), []);
+  const entryByUrl = useMemo(() => new Map<string, EntryType>(), []);
+  const aliasHashMap = useMemo(() => new Map<string, AliasType>(), []);
 
-  const aliasHashMap = useMemo(() => {
-    return buildAliasHashMap(aliases);
+  const entryById = useMemo(() => {
+    return new Map(entries.map((e) => [e.id, e]));
+  }, [entries]);
+
+  const entriesFuse = useMemo(() => {
+    return new Fuse(entries, {
+      keys: ["label", "norm"],
+      threshold: FUZZY_THRESHOLD,
+      includeScore: true,
+    });
+  }, [entries]);
+
+  const aliasesFuse = useMemo(() => {
+    return new Fuse(aliases, {
+      keys: ["label", "norm"],
+      threshold: FUZZY_THRESHOLD,
+      includeScore: true,
+    });
   }, [aliases]);
+
   const [inputValue, setInputValue] = useState("");
   const [showCorrectEffect, setShowCorrectEffect] = useState(false);
   const [showErrorEffect, setShowErrorEffect] = useState(false);
@@ -338,12 +288,13 @@ export default function GuessInput({
       const correctEntry = await checkGuess(
         category,
         inputValue,
-        aliases,
         aliasHashMap,
         entryByNorm,
         entryByUrl,
-        entries,
-        isDynamic
+        entriesFuse,
+        aliasesFuse,
+        entryById,
+        true
       );
 
       if (correctEntry) {
@@ -361,13 +312,15 @@ export default function GuessInput({
     },
     [
       inputValue,
-      entryByNorm,
-      entryByUrl,
-      entries,
       category,
-      isDynamic,
       onCorrectGuess,
       onIncorrectGuess,
+      entryByNorm,
+      entryByUrl,
+      aliasHashMap,
+      entriesFuse,
+      aliasesFuse,
+      entryById,
     ]
   );
 
@@ -380,20 +333,20 @@ export default function GuessInput({
   return (
     <div className="guess-input-container">
       <div className="spinner-wrapper">
-    {loading && <div className="spinner"></div>}
-  </div>
-    <input
-      readOnly={loading}
-      disabled={isGameCompleted || disabled}
-      type="text"
-      value={inputValue}
-      onChange={(e) => setInputValue(e.target.value)}
-      onKeyDown={handleKeyPress}
-      placeholder="Enter your guess..."
-      className={`guess-input ${showErrorEffect ? "error-fade" : ""} ${
-        showCorrectEffect ? "correct-fade" : ""
-      }`}
-    />
-  </div>
+        {loading && <div className="spinner"></div>}
+      </div>
+      <input
+        readOnly={loading}
+        disabled={isGameCompleted || disabled}
+        type="text"
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+        onKeyDown={handleKeyPress}
+        placeholder="Enter your guess..."
+        className={`guess-input ${showErrorEffect ? "error-fade" : ""} ${
+          showCorrectEffect ? "correct-fade" : ""
+        }`}
+      />
+    </div>
   );
 }

@@ -20,11 +20,10 @@ export default async function QuizPage({
       difficulties: {
         orderBy: { level: "asc" },
       },
-      entries: true,
     },
   });
 
-  const aliases = await prisma.alias.findMany({
+  const totalEntries = await prisma.entry.count({
     where: { categoryId: category?.id },
   });
 
@@ -34,11 +33,11 @@ export default async function QuizPage({
 
   return (
     <QuizGame
-      aliases={aliases}
+      aliases={[]}
       category={category}
       difficulties={category.difficulties || []}
-      entries={category.entries || []}
-      totalEntries={category.entries?.length || 0}
+      entries={[]}
+      totalEntries={totalEntries}
       slug={slug}
       isDynamic={category.isDynamic}
       initialSession={session}
