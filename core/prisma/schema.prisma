@@ -37,6 +37,7 @@ model Category {
   playedOn DateTime?
   isDaily Boolean?
   hasBeenSelected Boolean?
+  tags String[] @default([])
 
   entries   Entry[]
   difficulties  Difficulty[]
