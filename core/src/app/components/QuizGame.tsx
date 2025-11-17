@@ -14,6 +14,7 @@ import Link from "next/link";
 import { DifficultyType, EntryType, QuizGameClientPropsType } from "./types";
 import LeaderboardButton from "./LeaderboardButton";
 import CompletedDialog from "./CompletedDialog";
+import StartButton from "./StartButton";
 
 function resolveDifficultyName(difficulty?: DifficultyType | null): string {
   if (!difficulty) {
@@ -74,6 +75,7 @@ export default function QuizGame({
   const [givenUp, setGivenUp] = useState(false);
   const [shouldReset, setShouldReset] = useState(false);
   const [showFinishedIndicator, setShowFinishedIndicator] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
   const hasPostedRef = useRef(false);
 
   const targetEntries = selectedDifficulty?.limit || safeTotalEntries;
@@ -123,6 +125,10 @@ export default function QuizGame({
     [incorrectGuesses]
   );
 
+  const handleStart = useCallback(() => {
+    setGameStarted(true);
+  }, []);
+
   const handleRestart = useCallback(() => {
     hasPostedRef.current = false;
     setGivenUp(false);
@@ -131,6 +137,7 @@ export default function QuizGame({
     setIncorrectGuesses([]);
     setFinalTime(null);
     setShouldReset(true);
+    setGameStarted(false);
   }, []);
 
   const handleStopwatchReset = useCallback(() => {
@@ -283,15 +290,16 @@ export default function QuizGame({
 
         <div className="category-name">{safeCategory.name}</div>
         <Stopwatch
-          isRunning={!isGameCompleted}
+          isRunning={!isGameCompleted && (!isDaily || gameStarted)}
           shouldReset={shouldReset}
           onResetComplete={handleStopwatchReset}
           onTimeUpdate={handleStopwatchUpdate}
         />
 
         <div className="give-up-restart-button-container">
-          <GiveUpButton disabled={isGameCompleted} onGiveUp={handleGiveUp} />
-
+          {(!isDaily || gameStarted) && (
+            <GiveUpButton disabled={isGameCompleted} onGiveUp={handleGiveUp} />
+          )}
           <LeaderboardButton slug={slug} />
           <RestartButton
             disabled={!isGameCompleted}
@@ -338,7 +346,7 @@ export default function QuizGame({
           <GuessInput
             aliases={safeAliases}
             category={safeCategory}
-            disabled={isGameCompleted}
+            disabled={isGameCompleted || (isDaily && !gameStarted)}
             entries={safeEntries}
             isDynamic={safeIsDynamic}
             isGameCompleted={isGameCompleted}
@@ -351,10 +359,21 @@ export default function QuizGame({
         </div>
       </div>
 
-      <QuizTable
-        correctGuesses={correctGuesses}
-        incorrectGuesses={incorrectGuesses}
-      />
+      <div className="quiz-table-wrapper">
+        {isDaily && !gameStarted && (
+          <div className="start-screen-box">
+            <div className="start-screen-content">
+              <div className="start-screen-button-container">
+                <StartButton disabled={false} onStart={handleStart} />
+              </div>
+            </div>
+          </div>
+        )}
+        <QuizTable
+          correctGuesses={correctGuesses}
+          incorrectGuesses={incorrectGuesses}
+        />
+      </div>
 
       <CompletedDialog
         isOpen={showFinishedIndicator}

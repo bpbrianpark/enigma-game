@@ -53,6 +53,9 @@ export default function ClientNavBar({ initialSession }: ClientNavBarProps) {
             </Link>
           </div>
           <div className="right-side-buttons">
+            <Link href="/categories" className="categories-link">
+              Categories
+            </Link>
             <div className="info-button-desktop" onClick={handleClickInfoButton}>
               <CircleQuestionMark size={24}/>
             </div>

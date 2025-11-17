@@ -98,7 +98,7 @@ export interface QuizGameClientPropsType {
 }
 
 export interface QuizTablePropsType {
-  correctGuesses: Entry[];
+  correctGuesses: EntryType[];
   incorrectGuesses: string[];
 }
 
