@@ -6,6 +6,7 @@ import Fuse from "fuse.js";
 import { useCallback, useMemo, useState } from "react";
 import { queryWDQS } from "../../../lib/wdqs";
 import { normalize } from "../../../lib/normalize";
+import { transformGuess } from "../../../lib/special-cases";
 import { AliasType, CategoryType, EntryType, GuessInputProps } from "./types";
 
 const FUZZY_THRESHOLD = 0.1;
@@ -178,7 +179,8 @@ async function checkGuess(
   entryById: Map<string, EntryType>,
   isDynamic: boolean
 ): Promise<EntryType | null> {
-  const normalizedGuess = normalize(guess);
+  const transformedGuess = transformGuess(category.slug, guess);
+  const normalizedGuess = normalize(transformedGuess);
 
   if (normalizedGuess.length === 0) return null;
 
@@ -187,7 +189,7 @@ async function checkGuess(
     return correspondingEntry;
   }
 
-  const fuzzyMatch = fuzzySearch(entriesFuse, guess, normalizedGuess);
+  const fuzzyMatch = fuzzySearch(entriesFuse, transformedGuess, normalizedGuess);
   if (fuzzyMatch) {
     return fuzzyMatch;
   }
@@ -200,7 +202,7 @@ async function checkGuess(
     }
   }
 
-  const aliasFuzzyMatch = fuzzySearch(aliasesFuse, guess, normalizedGuess);
+  const aliasFuzzyMatch = fuzzySearch(aliasesFuse, transformedGuess, normalizedGuess);
   if (aliasFuzzyMatch) {
     const entry = entryById.get(aliasFuzzyMatch.entryId) || null;
     if (entry) {
@@ -213,7 +215,7 @@ async function checkGuess(
       aliasHashMap,
       entryByNorm,
       entryByUrl,
-      guess,
+      transformedGuess,
       category
     );
     if (!verifiedEntry) {
