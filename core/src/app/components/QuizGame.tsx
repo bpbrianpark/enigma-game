@@ -265,17 +265,21 @@ export default function QuizGame({
   }
 }, [isTargetEntriesGuessed, givenUp]);
 
+  const isDaily = safeCategory.isDaily === true;
+
   return (
     <div className="quiz-container">
       <div className="quiz-top-layer">
-        <div className="difficulty-picker-container">
-          <DifficultyPicker
-            difficulties={safeDifficulties}
-            selectedDifficulty={selectedDifficulty}
-            onDifficultyChange={handleDifficultyChange}
-            disabled={isTargetEntriesGuessed}
-          ></DifficultyPicker>
-        </div>
+        {!isDaily && (
+          <div className="difficulty-picker-container">
+            <DifficultyPicker
+              difficulties={safeDifficulties}
+              selectedDifficulty={selectedDifficulty}
+              onDifficultyChange={handleDifficultyChange}
+              disabled={isTargetEntriesGuessed}
+            ></DifficultyPicker>
+          </div>
+        )}
 
         <div className="category-name">{safeCategory.name}</div>
         <Stopwatch
@@ -306,7 +310,7 @@ export default function QuizGame({
             </p>
           </div>
         )}
-
+        {isGameCompleted && (
         <div className="completed-game-message-container">
           {givenUp && (
             <span className="completed-game-message">
@@ -326,6 +330,7 @@ export default function QuizGame({
             </span>
           )}
         </div>
+        )}
       </div>
 
       <div className="quiz-second-layer">

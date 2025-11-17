@@ -108,36 +108,6 @@ export default function BlitzGame({
     setShouldReset(false);
   }, []);
 
-  const handleTimeUp = useCallback(() => {
-    setTimeUp(true);
-    if (!hasPostedRef.current) {
-      hasPostedRef.current = true;
-      postGameData(finalTime ?? undefined);
-    }
-  }, []);
-
-  const handleTimerUpdate = useCallback(
-    (remainingTime: number) => {
-      if (
-        (isTargetEntriesGuessed || givenUp || remainingTime <= 0) &&
-        finalTime === null
-      ) {
-        const elapsedTime = timeLimit - remainingTime;
-        setFinalTime(elapsedTime);
-        setShowFinishedIndicator(true);
-        if (!hasPostedRef.current) {
-          hasPostedRef.current = true;
-          postGameData(elapsedTime);
-        }
-      }
-    },
-    [givenUp, isTargetEntriesGuessed, finalTime, timeLimit, postGameData]
-  );
-
-  const handleCloseCongratsDialog = useCallback(() => {
-    setShowFinishedIndicator(false);
-  }, [showFinishedIndicator]);
-
   const postGameData = useCallback(
     async (time?: number) => {
       console.log("Posting This: ", correctGuesses.length);
@@ -201,6 +171,36 @@ export default function BlitzGame({
     },
     [username, slug, selectedDifficulty, targetEntries, correctGuesses]
   );
+
+  const handleTimeUp = useCallback(() => {
+    setTimeUp(true);
+    if (!hasPostedRef.current) {
+      hasPostedRef.current = true;
+      postGameData(finalTime ?? undefined);
+    }
+  }, [finalTime, postGameData]);
+
+  const handleTimerUpdate = useCallback(
+    (remainingTime: number) => {
+      if (
+        (isTargetEntriesGuessed || givenUp || remainingTime <= 0) &&
+        finalTime === null
+      ) {
+        const elapsedTime = timeLimit - remainingTime;
+        setFinalTime(elapsedTime);
+        setShowFinishedIndicator(true);
+        if (!hasPostedRef.current) {
+          hasPostedRef.current = true;
+          postGameData(elapsedTime);
+        }
+      }
+    },
+    [givenUp, isTargetEntriesGuessed, finalTime, timeLimit, postGameData]
+  );
+
+  const handleCloseCongratsDialog = useCallback(() => {
+    setShowFinishedIndicator(false);
+  }, [showFinishedIndicator]);
 
   useEffect(() => {
     if (
@@ -279,7 +279,7 @@ export default function BlitzGame({
             </p>
           </div>
         )}
-
+      {isGameCompleted && (
         <div className="completed-game-message-container">
           {givenUp && (
             <span className="completed-game-message">
@@ -293,6 +293,7 @@ export default function BlitzGame({
             </span>
           )}
         </div>
+      )}
       </div>
 
       <div className="quiz-second-layer">
@@ -308,7 +309,6 @@ export default function BlitzGame({
             onIncorrectGuess={handleIncorrectGuess}
           />
         )}
-        <div className="progress-text">{correctGuesses.length}</div>
       </div>
 
       <QuizTable
