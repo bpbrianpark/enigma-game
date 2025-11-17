@@ -26,7 +26,6 @@ const fetcher = async (url: string) => {
         const body = await res.text();
         const details = body ? safeJson(body) : undefined;
         console.error("[Leaderboard] fetch failed", { url, status: res.status, body, details });
-        throw new Error(details?.error ?? details ?? body ?? `Request failed with status ${res.status}`);
     }
     return res.json();
 };
@@ -94,14 +93,13 @@ export default function Leaderboard({ category, difficulties, initialGames, slug
         <div className="leaderboard-grid">
             <div className="leaderboard">
                 <h1 className="leaderboard-title">{category.name}</h1>
-
+                {category.isDaily === false && (
                 <div className="leaderboard-controls">
-                    <DifficultyPicker
-                        difficulties={difficulties}
-                        selectedDifficulty={selectedDifficulty}
-                        onDifficultyChange={setSelectedDifficulty}
-                    />
-
+                        <DifficultyPicker
+                            difficulties={difficulties}
+                            selectedDifficulty={selectedDifficulty}
+                            onDifficultyChange={setSelectedDifficulty}
+                        />
                     <div className="game-mode-toggle">
                         <button
                             className={`toggle-button ${gameMode === 'normal' ? 'active' : ''}`}
@@ -117,6 +115,7 @@ export default function Leaderboard({ category, difficulties, initialGames, slug
                         </button>
                     </div>
                 </div>
+                )}
 
                 {displayedGames.length === 0 ? (
                     <div className="no-games-message">

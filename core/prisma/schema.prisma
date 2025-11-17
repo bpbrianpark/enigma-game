@@ -34,11 +34,17 @@ model Category {
   updateSparql String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt 
+  playedOn DateTime?
+  isDaily Boolean?
+  hasBeenSelected Boolean?
 
   entries   Entry[]
   difficulties  Difficulty[]
   games     Game[]
   aliases Alias[]
+
+  @@index([isDaily, hasBeenSelected])
+  @@index([isDaily, playedOn])
 }
 
 model Difficulty {

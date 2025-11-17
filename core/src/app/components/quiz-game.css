@@ -9,7 +9,7 @@
   min-height: 700px;
   padding: 24px 0 48px;
   position: relative;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 @media (max-width: 768px) {

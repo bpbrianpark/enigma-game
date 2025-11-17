@@ -10,6 +10,7 @@ export default async function Home() {
       slug: true,
       name: true,
       imageUrl: true,
+      isDaily: false,
     },
   });
 

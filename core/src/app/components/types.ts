@@ -20,6 +20,9 @@ export interface CategoryType {
   updateSparql?: string | null;  
   createdAt: Date;
   updatedAt: Date;
+  isDaily?: boolean | null;
+  hasBeenSelected?: boolean | null;
+  playedOn?: Date | null;
 }
 
 
