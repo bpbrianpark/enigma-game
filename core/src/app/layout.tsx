@@ -9,6 +9,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../lib/auth";
 import Footer from "./components/Footer";
 import AdSlot from "./components/AdSlot";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,6 +55,7 @@ export default async function RootLayout({
           <AdSlot slot={bottomAdSlot} className="bottom-banner-ad" />
         ) : null}
         <Footer />
+        <SpeedInsights />
         <Analytics />
         </Provider>
       </body>
