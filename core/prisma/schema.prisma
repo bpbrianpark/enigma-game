@@ -96,6 +96,7 @@ model Game {
   targetCount Int?
   correct_count Int
   isBlitzGame Boolean?
+  isDailyGame Boolean?
   entriesCounted Boolean @default(false)
 
   user  User  @relation(fields:[username],references:[username], onDelete: Cascade)

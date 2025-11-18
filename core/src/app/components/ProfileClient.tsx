@@ -6,12 +6,12 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ProfileClientPropsType } from "./types";
 import AdSlot from "./AdSlot";
- 
+
 export default function ProfileClient({
-    difficulties,
-    categories,
-    user,
-    games
+  difficulties,
+  categories,
+  user,
+  games,
 }: ProfileClientPropsType) {
   const { data: session } = useSession();
   const isLoggedIn = !!session;
@@ -29,7 +29,8 @@ export default function ProfileClient({
     const averageCorrect =
       totalGames > 0
         ? Math.round(
-            games.reduce((sum, game) => sum + game.correct_count, 0) / totalGames
+            games.reduce((sum, game) => sum + game.correct_count, 0) /
+              totalGames
           )
         : 0;
     const bestScore =
@@ -44,51 +45,63 @@ export default function ProfileClient({
   }, [games]);
 
   const findCategoryName = (slug: string) => {
-    const category = categories.find(cat => cat.slug === slug);
+    const category = categories.find((cat) => cat.slug === slug);
     return category?.name || slug;
   };
 
   const normalGames = useMemo(() => {
-  return sortedGames.filter(game => game.isBlitzGame === null || game.isBlitzGame === undefined);
-}, [sortedGames]);
+    return sortedGames.filter(
+      (game) => 
+        (game.isBlitzGame === null || game.isBlitzGame === undefined) &&
+        !game.isDailyGame
+    );
+  }, [sortedGames]);
 
-const blitzGames = useMemo(() => {
-  return sortedGames.filter(game => game.isBlitzGame === true);
-}, [sortedGames]);
+  const blitzGames = useMemo(() => {
+    return sortedGames.filter((game) => game.isBlitzGame === true);
+  }, [sortedGames]);
 
-  const findDifficulty = (difficultyId: string) => {
-  const difficulty = difficulties.find(diff => diff.id === difficultyId);
-  if (!difficulty) return 'Unknown';
-  
-  switch (difficulty.level) {
-    case 1:
-      return 'Easy';
-    case 2:
-      return 'Medium';
-    case 3:
-      return 'Hard';
-    case 4:
-      return 'Expert';
-    case 5:
-      return 'Master';
-    default:
-      return `Level ${difficulty.level}`;
-  }
-}
+  const dailyGames = useMemo(() => {
+    return sortedGames.filter((game) => game.isDailyGame === true);
+  }, [sortedGames]);
 
-const formatBlitzTime = (difficultyId: string) => {
-  const difficulty = difficulties.find((diff) => diff.id === difficultyId);
-  return formatTime(difficulty?.timeLimit ?? 0);
-};
+  const findDifficulty = (difficultyId: string, isDailyGame?: boolean) => {
+    if (isDailyGame) return "Daily";
+    
+    const difficulty = difficulties.find((diff) => diff.id === difficultyId);
+    if (!difficulty) return "Unknown";
 
-function formatTime(milliseconds: number = 0): string {
+    switch (difficulty.level) {
+      case 1:
+        return "Easy";
+      case 2:
+        return "Medium";
+      case 3:
+        return "Hard";
+      case 4:
+        return "Expert";
+      case 5:
+        return "Master";
+      default:
+        return `Level ${difficulty.level}`;
+    }
+  };
+
+  const formatBlitzTime = (difficultyId: string) => {
+    const difficulty = difficulties.find((diff) => diff.id === difficultyId);
+    return formatTime(difficulty?.timeLimit ?? 0);
+  };
+
+  function formatTime(milliseconds: number = 0): string {
     const totalSeconds = Math.floor(milliseconds / 1000);
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
-    
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }   
+
+    return `${hours.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  }
 
   const sideAdSlotId = process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR;
 
@@ -118,29 +131,15 @@ function formatTime(milliseconds: number = 0): string {
             </div>
           </div>
 
-          <div className="stats-section">
-            <h2>Statistics</h2>
-            <div className="stats-grid">
-              <div className="stat-card">
-                <div className="stat-number">{stats.totalGames}</div>
-                <div className="stat-label">Total Games</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-number">{stats.completedGames}</div>
-                <div className="stat-label">Completed</div>
-              </div>
-            </div>
-          </div>
-
           <div className="games-section">
-            <h2>Normal Game History</h2>
-            {normalGames.length === 0 ? (
+            <h2>Daily Game</h2>
+            {dailyGames.length === 0 ? (
               <div className="no-games">
-                <p>No games played yet.</p>
+                <p>No daily games played yet.</p>
               </div>
             ) : (
               <div className="games-list">
-                {normalGames.map((game) => {
+                {dailyGames.map((game) => {
                   const targetCount = game.targetCount ?? 0;
                   return (
                     <div key={game.id} className="game-card">
@@ -152,9 +151,13 @@ function formatTime(milliseconds: number = 0): string {
                         </div>
                         <div className="game-status">
                           {game.correct_count >= targetCount ? (
-                            <span className="status-completed">✓ Completed</span>
+                            <span className="status-completed">
+                              ✓ Completed
+                            </span>
                           ) : (
-                            <span className="status-incomplete">Incomplete</span>
+                            <span className="status-incomplete">
+                              Incomplete
+                            </span>
                           )}
                         </div>
                       </div>
@@ -174,7 +177,72 @@ function formatTime(milliseconds: number = 0): string {
                         </div>
                         <div className="game-stat">
                           <span className="stat-value">
-                            {findDifficulty(game.difficultyId)}
+                            {findDifficulty(game.difficultyId, game.isDailyGame ?? undefined)}
+                          </span>
+                          <span className="stat-name">Difficulty</span>
+                        </div>
+                      </div>
+
+                      {game.correct_count >= targetCount && (
+                        <div className="completion-time">
+                          Completed {targetCount} items in{" "}
+                          {formatTime(game.time)}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          <div className="games-section">
+            <h2>Game History</h2>
+            {normalGames.length === 0 ? (
+              <div className="no-games">
+                <p>No games played yet.</p>
+              </div>
+            ) : (
+              <div className="games-list">
+                {normalGames.map((game) => {
+                  const targetCount = game.targetCount ?? 0;
+                  return (
+                    <div key={game.id} className="game-card">
+                      <div className="game-header">
+                        <div className="game-info">
+                          <span className="profile-category-name">
+                            {findCategoryName(game.slug)}
+                          </span>
+                        </div>
+                        <div className="game-status">
+                          {game.correct_count >= targetCount ? (
+                            <span className="status-completed">
+                              ✓ Completed
+                            </span>
+                          ) : (
+                            <span className="status-incomplete">
+                              Incomplete
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="game-stats">
+                        <div className="game-stat">
+                          <span className="stat-value">
+                            {game.correct_count}/{targetCount}
+                          </span>
+                          <span className="stat-name">Score</span>
+                        </div>
+                        <div className="game-stat">
+                          <span className="stat-value">
+                            {formatTime(game.time)}
+                          </span>
+                          <span className="stat-name">Time</span>
+                        </div>
+                        <div className="game-stat">
+                          <span className="stat-value">
+                            {findDifficulty(game.difficultyId, game.isDailyGame ?? undefined)}
                           </span>
                           <span className="stat-name">Difficulty</span>
                         </div>
@@ -215,7 +283,9 @@ function formatTime(milliseconds: number = 0): string {
 
                       <div className="game-stats">
                         <div className="game-stat">
-                          <span className="stat-value">{game.correct_count}</span>
+                          <span className="stat-value">
+                            {game.correct_count}
+                          </span>
                           <span className="stat-name">Count</span>
                         </div>
                         <div className="game-stat">

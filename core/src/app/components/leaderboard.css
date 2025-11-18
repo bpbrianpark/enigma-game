@@ -51,6 +51,7 @@
     flex-direction: column;
     align-items: center;
     width: 100%;
+    max-width: 20rem;
     background-color: var(--color-primary);
     border-radius: 8px;
     border: 2px solid var(--color-secondary);
@@ -98,10 +99,6 @@
 
 .leaderboard-table tr:nth-child(even) {
     background-color: var(--color-secondary);
-}
-
-.leaderboard-table tr:hover {
-    background-color: rgba(63, 114, 175, 0.1);
 }
 
 .username {
@@ -204,8 +201,7 @@
 }
 
 .top-entry-bar {
-  height: 10px;
-  border-radius: 4px;
+  height: 20px;
   background-color: var(--color-accent);
   transition: width 0.3s ease;
 }
@@ -236,6 +232,7 @@
 
   .leaderboard {
     padding: 16px;
+    justify-self: center;
   }
 
   .top-entries-panel {

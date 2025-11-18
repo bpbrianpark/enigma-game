@@ -18,9 +18,38 @@ export default async function ProfilePage({
     where: { username },
   });
 
-  const games = await prisma.game.findMany({
-    where: { username },
+  const dailyGames = await prisma.game.findMany({
+    where: { 
+      username,
+      isDailyGame: true
+    },
+    orderBy: { id: 'desc' },
+    take: 1,
   });
+
+  const normalGames = await prisma.game.findMany({
+    where: { 
+      username,
+      OR: [
+        { isBlitzGame: null },
+        { isBlitzGame: false }
+      ],
+      isDailyGame: false
+    },
+    orderBy: { id: 'desc' },
+    take: 3,
+  });
+
+  const blitzGames = await prisma.game.findMany({
+    where: { 
+      username,
+      isBlitzGame: true
+    },
+    orderBy: { id: 'desc' },
+    take: 3,
+  });
+
+  const games = [...dailyGames, ...normalGames, ...blitzGames];
 
   const categories = await prisma.category.findMany();
 
