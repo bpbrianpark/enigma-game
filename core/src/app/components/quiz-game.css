@@ -16,7 +16,7 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding-top: 24px;
+  padding-top: 50%;
 }
 
 @media (max-width: 1024px) {
