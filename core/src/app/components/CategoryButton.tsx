@@ -26,7 +26,6 @@ export default function CategoryButton({ slug, name, imageUrl }: CategoryButtonP
             <span className="category-placeholder-icon">{name.charAt(0).toUpperCase()}</span>
           </div>
         )}
-        <div className="category-overlay"></div>
       </div>
       
       <div className="category-content">
@@ -34,15 +33,15 @@ export default function CategoryButton({ slug, name, imageUrl }: CategoryButtonP
         
         <div className="category-mode-options">
           <Link href={`${baseUrl}/quiz/${slug}`} className="mode-button-link">
-            <div className="mode-button normal">
+            <button className="mode-button normal">
               <span className="mode-text">Normal</span>
-            </div>
+            </button>
           </Link>
 
           <Link href={`${baseUrl}/blitz/${slug}`} className="mode-button-link">
-            <div className="mode-button blitz">
+            <button className="mode-button blitz">
               <span className="mode-text">Blitz</span>
-            </div>
+            </button>
           </Link>
         </div>
       </div>

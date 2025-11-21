@@ -66,6 +66,7 @@ export interface DifficultyPickerProps {
   selectedDifficulty: DifficultyType | null;
   onDifficultyChange: (difficulty: DifficultyType) => void;
   disabled?: boolean;
+  isDaily?: boolean;
 }
 
 export interface GuessInputProps {
@@ -75,7 +76,7 @@ export interface GuessInputProps {
   entries: Entry[];
   isDynamic: boolean;
   isGameCompleted: boolean;
-  onCorrectGuess: (entry: Entry) => void;
+  onCorrectGuess: (entry: EntryType) => void;
   onIncorrectGuess: (guess: string) => void;
 }
 
@@ -98,7 +99,7 @@ export interface QuizGameClientPropsType {
 }
 
 export interface QuizTablePropsType {
-  correctGuesses: Entry[];
+  correctGuesses: EntryType[];
   incorrectGuesses: string[];
 }
 

@@ -1,6 +1,5 @@
 import './button.css'
-
-import { useCallback, useMemo, useState } from 'react';
+import { RotateCcw } from 'lucide-react';
 
 interface RestartButtonProps {
   onRestart: () => void;
@@ -8,23 +7,19 @@ interface RestartButtonProps {
 }
 
 export default function RestartButton({ onRestart, disabled = false }: RestartButtonProps) {
-  const [inputValue, setInputValue] = useState('');
-
   const handleSubmit = () => {
     if (disabled) return;
     onRestart();
   }
 
-
   return (
-    <div className="restart-wrapper">
-      <button 
-        onClick={handleSubmit}
-        disabled={disabled}
-        className="restart-button"
-      >
-        Restart
-      </button>
-    </div>
+    <button 
+      onClick={handleSubmit}
+      disabled={disabled}
+      className="control-button control-button-secondary"
+    >
+      <RotateCcw className="control-button-icon" />
+      Restart
+    </button>
   );
 }

@@ -333,22 +333,31 @@ export default function GuessInput({
   };
 
   return (
-    <div className="guess-input-container">
-      <div className="spinner-wrapper">
-        {loading && <div className="spinner"></div>}
+    <div className="guess-input-wrapper">
+      <div className="guess-input-row">
+        <div className="spinner-wrapper">
+          {loading && <div className="spinner"></div>}
+        </div>
+        <input
+          readOnly={loading}
+          disabled={isGameCompleted || disabled}
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyPress}
+          placeholder="Type your answer..."
+          className={`guess-input ${showErrorEffect ? "error-fade" : ""} ${
+            showCorrectEffect ? "correct-fade" : ""
+          }`}
+        />
+        <button
+          onClick={handleSubmit}
+          disabled={isGameCompleted || disabled || !inputValue.trim() || loading}
+          className="guess-submit-button"
+        >
+          Submit
+        </button>
       </div>
-      <input
-        readOnly={loading}
-        disabled={isGameCompleted || disabled}
-        type="text"
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        onKeyDown={handleKeyPress}
-        placeholder="Enter your guess..."
-        className={`guess-input ${showErrorEffect ? "error-fade" : ""} ${
-          showCorrectEffect ? "correct-fade" : ""
-        }`}
-      />
     </div>
   );
 }

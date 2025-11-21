@@ -1,4 +1,5 @@
 import "./button.css";
+import { Flag } from "lucide-react";
 
 interface GuessInputProps {
   onGiveUp: () => void;
@@ -14,14 +15,13 @@ export default function GiveUpButton({ onGiveUp, disabled = false }: GuessInputP
 
 
   return (
-    <div className="give-up-wrapper">
-      <button 
-        onClick={handleSubmit}
-        disabled={disabled}
-        className="give-up-button"
-      >
-        Give Up
-      </button>
-    </div>
+    <button 
+      onClick={handleSubmit}
+      disabled={disabled}
+      className="control-button control-button-destructive"
+    >
+      <Flag className="control-button-icon" />
+      Give Up
+    </button>
   );
 }

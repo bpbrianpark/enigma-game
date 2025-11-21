@@ -7,15 +7,19 @@ import { useRouter } from "next/navigation";
 import GuessInput from "./GuessInput";
 import QuizTable from "./QuizTable";
 import Stopwatch from "./Stopwatch";
-import DifficultyPicker from "./DifficultyPicker";
+import DifficultySelect from "./DifficultySelect";
 import GiveUpButton from "./GiveUpButton";
 import RestartButton from "./RestartButton";
 import Link from "next/link";
 import { DifficultyType, EntryType, QuizGameClientPropsType } from "./types";
 import LeaderboardButton from "./LeaderboardButton";
+import BackToCategoriesButton from "./BackToCategoriesButton";
+import AuthButton from "./AuthButton";
 import CompletedDialog from "./CompletedDialog";
 import StartButton from "./StartButton";
+import InfoDialog from "./InfoDialog";
 import AdSlot from "./AdSlot";
+import { CircleQuestionMark } from "lucide-react";
 
 function resolveDifficultyName(difficulty?: DifficultyType | null): string {
   if (!difficulty) {
@@ -77,6 +81,7 @@ export default function QuizGame({
   const [shouldReset, setShouldReset] = useState(false);
   const [showFinishedIndicator, setShowFinishedIndicator] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
+  const [showInfoDialog, setShowInfoDialog] = useState(false);
   const hasPostedRef = useRef(false);
 
   const targetEntries = selectedDifficulty?.limit || safeTotalEntries;
@@ -148,6 +153,14 @@ export default function QuizGame({
   const handleCloseCongratsDialog = useCallback(() => {
     setShowFinishedIndicator(false);
   }, [showFinishedIndicator]);
+
+  const handleOpenInfoDialog = useCallback(() => {
+    setShowInfoDialog(true);
+  }, []);
+
+  const handleCloseInfoDialog = useCallback(() => {
+    setShowInfoDialog(false);
+  }, []);
 
   const postGameData = useCallback(
     async (time?: number) => {
@@ -275,6 +288,17 @@ export default function QuizGame({
 
   const isDaily = safeCategory.isDaily === true;
 
+  const getDailyLabel = () => {
+    if (!isDaily) return "Rush";
+    const today = new Date();
+    const formattedDate = today.toLocaleDateString('en-US', { 
+      month: 'long', 
+      day: 'numeric', 
+      year: 'numeric' 
+    });
+    return `Daily Challenge: ${formattedDate}`;
+  };
+
   const sideAdSlotId = process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR;
 
   return (
@@ -284,38 +308,61 @@ export default function QuizGame({
       </aside>
       <div className="quiz-center-column">
         <div className="quiz-container">
+          <div className="quiz-header-section">
+            <div className="quiz-header-content">
+              <h1 className="game-mode-name">{getDailyLabel()}</h1>
+            </div>
+            <div className="quiz-header-row">
+              <h1 className="category-name">{safeCategory.name}</h1>
+              <div className="quiz-header-actions">
+                <button onClick={handleOpenInfoDialog} className="header-button">
+                  <CircleQuestionMark className="header-button-icon" />
+                  How to Play
+                </button>
+                <LeaderboardButton slug={slug} />
+                <BackToCategoriesButton />
+                <AuthButton />
+              </div>
+            </div>
+          </div>
+
           <div className="quiz-top-layer">
-            {!isDaily && (
-              <div className="difficulty-picker-container">
-                <DifficultyPicker
+            <div className="timer-controls-wrapper">
+              <div className="timer-section">
+                <div className="timer-label">Time</div>
+                <Stopwatch
+                  isRunning={!isGameCompleted && (!isDaily || gameStarted)}
+                  shouldReset={shouldReset}
+                  onResetComplete={handleStopwatchReset}
+                  onTimeUpdate={handleStopwatchUpdate}
+                />
+              </div>
+              
+              <div className="controls-row">
+                <DifficultySelect
                   difficulties={safeDifficulties}
                   selectedDifficulty={selectedDifficulty}
                   onDifficultyChange={handleDifficultyChange}
-                  disabled={isTargetEntriesGuessed}
-                ></DifficultyPicker>
-              </div>
-            )}
-
-            <div className="category-name">{safeCategory.name}</div>
-            <Stopwatch
-              isRunning={!isGameCompleted && (!isDaily || gameStarted)}
-              shouldReset={shouldReset}
-              onResetComplete={handleStopwatchReset}
-              onTimeUpdate={handleStopwatchUpdate}
-            />
-
-            <div className="give-up-restart-button-container">
-              {(!isDaily || gameStarted) && (
-                <GiveUpButton
-                  disabled={isGameCompleted}
-                  onGiveUp={handleGiveUp}
+                  disabled={isTargetEntriesGuessed || isDaily}
+                  isDaily={isDaily}
                 />
-              )}
-              <LeaderboardButton slug={slug} />
-              <RestartButton
-                disabled={!isGameCompleted}
-                onRestart={handleRestart}
-              />
+
+                <StartButton 
+                  disabled={!isDaily || gameStarted || isGameCompleted} 
+                  onStart={handleStart} 
+                />
+
+                <div className="control-buttons-group">
+                  <GiveUpButton
+                    disabled={isGameCompleted || (isDaily && !gameStarted)}
+                    onGiveUp={handleGiveUp}
+                  />
+                  <RestartButton
+                    disabled={!isGameCompleted}
+                    onRestart={handleRestart}
+                  />
+                </div>
+              </div>
             </div>
 
             {status !== "loading" && !session && (
@@ -366,20 +413,11 @@ export default function QuizGame({
               />
             )}
             <div className="progress-text">
-              {correctGuesses.length} / {targetEntries}
+              {correctGuesses.length} / {targetEntries} correct
             </div>
           </div>
 
           <div className="quiz-table-wrapper">
-            {isDaily && !gameStarted && (
-              <div className="start-screen-box">
-                <div className="start-screen-content">
-                  <div className="start-screen-button-container">
-                    <StartButton disabled={false} onStart={handleStart} />
-                  </div>
-                </div>
-              </div>
-            )}
             <QuizTable
               correctGuesses={correctGuesses}
               incorrectGuesses={incorrectGuesses}
@@ -396,6 +434,12 @@ export default function QuizGame({
             difficultyName={resolveDifficultyName(selectedDifficulty)}
             isLoggedIn={isLoggedIn}
             gameType={"Normal"}
+          />
+
+          <InfoDialog
+            isOpen={showInfoDialog}
+            onClose={handleCloseInfoDialog}
+            gameType={isDaily ? "Daily" : "Rush"}
           />
         </div>
       </div>
