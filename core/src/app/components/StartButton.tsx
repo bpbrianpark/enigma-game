@@ -11,16 +11,13 @@ export default function StartButton({ onStart, disabled = false }: StartButtonPr
     onStart();
   }
 
-
   return (
-    <div className="start-wrapper">
-      <button 
-        onClick={handleSubmit}
-        disabled={disabled}
-        className="start-button"
-      >
-        Start
-      </button>
-    </div>
+    <button 
+      onClick={handleSubmit}
+      disabled={disabled}
+      className="control-button control-button-secondary"
+    >
+      Start
+    </button>
   );
 }

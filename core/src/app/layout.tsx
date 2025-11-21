@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
-import NavBar from "./components/NavBar";
 import Provider from "./components/Provider";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../lib/auth";
@@ -49,7 +48,6 @@ export default async function RootLayout({
           />
         ) : null}
         <Provider>
-        <NavBar />
         {children}
         {bottomAdSlot ? (
           <AdSlot slot={bottomAdSlot} className="bottom-banner-ad" />

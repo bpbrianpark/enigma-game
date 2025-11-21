@@ -7,16 +7,20 @@ import { useRouter } from "next/navigation";
 import GuessInput from "./GuessInput";
 import QuizTable from "./QuizTable";
 import Stopwatch from "./Stopwatch";
-import DifficultyPicker from "./DifficultyPicker";
+import DifficultySelect from "./DifficultySelect";
 import GiveUpButton from "./GiveUpButton";
 import RestartButton from "./RestartButton";
 import Link from "next/link";
 import { DifficultyType, EntryType, QuizGameClientPropsType } from "./types";
 import LeaderboardButton from "./LeaderboardButton";
+import BackToCategoriesButton from "./BackToCategoriesButton";
+import AuthButton from "./AuthButton";
 import Timer from "./Timer";
 import StartButton from "./StartButton";
+import InfoDialog from "./InfoDialog";
 import CompletedDialog from "./CompletedDialog";
 import AdSlot from "./AdSlot";
+import { CircleQuestionMark } from "lucide-react";
 
 export default function BlitzGame({
   aliases,
@@ -56,6 +60,7 @@ export default function BlitzGame({
   const [shouldReset, setShouldReset] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
   const [showFinishedIndicator, setShowFinishedIndicator] = useState(false);
+  const [showInfoDialog, setShowInfoDialog] = useState(false);
   const hasPostedRef = useRef(false);
 
   const targetEntries = safeTotalEntries;
@@ -102,6 +107,11 @@ export default function BlitzGame({
     },
     [incorrectGuesses]
   );
+
+  const handleGiveUp = useCallback(() => {
+    setGivenUp(true);
+    setShowFinishedIndicator(true);
+  }, []);
 
   const handleStart = useCallback(() => {
     setGameStarted(true);
@@ -216,6 +226,14 @@ export default function BlitzGame({
     setShowFinishedIndicator(false);
   }, [showFinishedIndicator]);
 
+  const handleOpenInfoDialog = useCallback(() => {
+    setShowInfoDialog(true);
+  }, []);
+
+  const handleCloseInfoDialog = useCallback(() => {
+    setShowInfoDialog(false);
+  }, []);
+
   useEffect(() => {
     if (
       (isTargetEntriesGuessed &&
@@ -260,33 +278,62 @@ export default function BlitzGame({
       </aside>
       <div className="quiz-center-column">
         <div className="quiz-container">
-          <div className="quiz-top-layer">
-            <div className="difficulty-picker-container">
-              <DifficultyPicker
-                difficulties={safeDifficulties}
-                selectedDifficulty={selectedDifficulty}
-                onDifficultyChange={handleDifficultyChange}
-                disabled={isTargetEntriesGuessed}
-              ></DifficultyPicker>
+          <div className="quiz-header-section">
+            <div className="quiz-header-content">
+              <h1 className="game-mode-name">Blitz</h1>
             </div>
+            <div className="quiz-header-row">
+              <h1 className="category-name">{safeCategory.name}</h1>
+              <div className="quiz-header-actions">
+                <button onClick={handleOpenInfoDialog} className="header-button">
+                  <CircleQuestionMark className="header-button-icon" />
+                </button>
+                <LeaderboardButton slug={slug} />
+                <BackToCategoriesButton />
+                <AuthButton />
+              </div>
+            </div>
+          </div>
 
-            <div className="category-name">{safeCategory.name}</div>
-            <Timer
-              isRunning={!isGameCompleted && gameStarted}
-              shouldReset={shouldReset}
-              timeLimit={timeLimit}
-              onResetComplete={handleTimerReset}
-              onTimeUpdate={handleTimerUpdate}
-              onTimeUp={handleTimeUp}
-            />
+          <div className="quiz-top-layer">
+            <div className="timer-controls-wrapper">
+              <div className="timer-section">
+                <div className="timer-label">Time</div>
+                <Timer
+                  isRunning={!isGameCompleted && gameStarted}
+                  shouldReset={shouldReset}
+                  timeLimit={timeLimit}
+                  onResetComplete={handleTimerReset}
+                  onTimeUpdate={handleTimerUpdate}
+                  onTimeUp={handleTimeUp}
+                />
+              </div>
+              
+              <div className="controls-row">
+                <DifficultySelect
+                  difficulties={safeDifficulties}
+                  selectedDifficulty={selectedDifficulty}
+                  onDifficultyChange={handleDifficultyChange}
+                  disabled={isTargetEntriesGuessed}
+                  isDaily={false}
+                />
 
-            <div className="give-up-restart-button-container">
-              <StartButton disabled={gameStarted} onStart={handleStart} />
-              <LeaderboardButton slug={slug} />
-              <RestartButton
-                disabled={!isGameCompleted}
-                onRestart={handleRestart}
-              />
+                <StartButton 
+                  disabled={gameStarted || isGameCompleted} 
+                  onStart={handleStart} 
+                />
+
+                <div className="control-buttons-group">
+                  <GiveUpButton
+                    disabled={isGameCompleted || !gameStarted}
+                    onGiveUp={handleGiveUp}
+                  />
+                  <RestartButton
+                    disabled={!isGameCompleted}
+                    onRestart={handleRestart}
+                  />
+                </div>
+              </div>
             </div>
 
             {status !== "loading" && !session && (
@@ -318,22 +365,29 @@ export default function BlitzGame({
           </div>
 
           <div className="quiz-second-layer">
-            <GuessInput
-              aliases={safeAliases}
-              category={safeCategory}
-              disabled={!gameStarted}
-              entries={safeEntries}
-              isDynamic={safeIsDynamic}
-              isGameCompleted={isGameCompleted}
-              onCorrectGuess={handleCorrectGuess}
-              onIncorrectGuess={handleIncorrectGuess}
-            />
+            {category && (
+              <GuessInput
+                aliases={safeAliases}
+                category={safeCategory}
+                disabled={isGameCompleted || !gameStarted}
+                entries={safeEntries}
+                isDynamic={safeIsDynamic}
+                isGameCompleted={isGameCompleted}
+                onCorrectGuess={handleCorrectGuess}
+                onIncorrectGuess={handleIncorrectGuess}
+              />
+            )}
+            <div className="progress-text">
+              {correctGuesses.length} / {targetEntries} correct
+            </div>
           </div>
 
-          <QuizTable
-            correctGuesses={correctGuesses}
-            incorrectGuesses={incorrectGuesses}
-          />
+          <div className="quiz-table-wrapper">
+            <QuizTable
+              correctGuesses={correctGuesses}
+              incorrectGuesses={incorrectGuesses}
+            />
+          </div>
 
           <CompletedDialog
             isOpen={showFinishedIndicator}
@@ -344,6 +398,12 @@ export default function BlitzGame({
             categoryName={safeCategory.name}
             difficultyName={selectedDifficulty?.name ?? "Unknown"}
             isLoggedIn={isLoggedIn}
+            gameType={"Blitz"}
+          />
+
+          <InfoDialog
+            isOpen={showInfoDialog}
+            onClose={handleCloseInfoDialog}
             gameType={"Blitz"}
           />
         </div>

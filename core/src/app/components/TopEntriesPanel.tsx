@@ -20,7 +20,7 @@ export function TopEntriesPanel({ entries }: TopEntriesPanelProps) {
 
   return (
     <div className="top-entries-panel">
-      <h2 className="top-entries-title">Top 25 Guessed Entries</h2>
+      <h2 className="top-entries-title">Most Recently Guessed</h2>
       {entries.length === 0 ? (
         <div className="no-top-entries">No guesses recorded yet.</div>
       ) : (

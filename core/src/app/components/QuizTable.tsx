@@ -5,54 +5,52 @@ import { QuizTablePropsType } from "./types";
 export default function QuizTable({ correctGuesses, incorrectGuesses }: QuizTablePropsType) {
 
   return (
-    <div className="quiz-table">
-      <div className="guesses-column">
-          <span className="correct-guesses-header">
-            Correct Guesses
-        </span> 
-        <div className="guesses">
-            {correctGuesses.length === 0 ? (
-            <p className="placeholder">No correct guesses yet...</p>
-            ) : (
+    <div className="quiz-table-grid">
+      <div className="guess-card">
+        <h2 className="guess-card-title guess-card-title-correct">Correct Answers</h2>
+        <div className="guess-card-content">
+          {correctGuesses.length === 0 ? (
+            <div className="guess-empty-state">
+              No correct answers yet
+            </div>
+          ) : (
             <div className="guess-list">
-                {correctGuesses.map((guess, index) => (
+              {correctGuesses.map((guess, index) => (
                 <div 
-                    key={`correct-${guess.id}-${index}`} 
-                    className="correct-guess"
+                  key={`correct-${guess.id}-${index}`} 
+                  className="guess-item correct-guess-item"
                 >
-                  <Link href={guess.url} target="_blank" rel="noopener noreferrer">
-                    <span className="correct-guess-text">
-                      {index + 1}. {guess.label}
-                    </span>
+                  <Link href={guess.url} target="_blank" rel="noopener noreferrer" className="guess-link">
+                    {index + 1}. {guess.label}
                   </Link>
                 </div>
-                ))}
+              ))}
             </div>
-            )}
+          )}
         </div>
       </div>
 
-      <div className="guesses-column">
-          <span className="incorrect-guesses-header">
-            Incorrect Guesses
-          </span>
-          <div className="guesses">
-            {incorrectGuesses.length === 0 ? (
-              <p className="placeholder">No incorrect guesses yet...</p>
-            ) : (
-              <div className="guess-list">
-                {incorrectGuesses.map((guess, index) => (
-                  <div 
-                    key={`incorrect-${index}-${guess}`} 
-                    className="incorrect-guess"
-                  >
-                    <span className="incorrect-guess-text">{index + 1}. {guess}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+      <div className="guess-card">
+        <h2 className="guess-card-title guess-card-title-incorrect">Incorrect Answers</h2>
+        <div className="guess-card-content">
+          {incorrectGuesses.length === 0 ? (
+            <div className="guess-empty-state">
+              No incorrect answers yet
+            </div>
+          ) : (
+            <div className="guess-list">
+              {incorrectGuesses.map((guess, index) => (
+                <div 
+                  key={`incorrect-${index}-${guess}`} 
+                  className="guess-item incorrect-guess-item"
+                >
+                  {index + 1}. {guess}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
+      </div>
     </div>
   );
 }

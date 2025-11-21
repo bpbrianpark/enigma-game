@@ -2,6 +2,7 @@
 
 import "./button.css";
 import { useRouter } from "next/navigation";
+import { Trophy } from "lucide-react";
 
 interface LeaderboardButtonProps {
   slug: string;
@@ -15,10 +16,9 @@ export default function LeaderboardButton({ slug }: LeaderboardButtonProps) {
   };
 
   return (
-    <div className="leaderboard-wrapper">
-      <button onClick={handleClick} className="leaderboard-button">
-        Leaderboard
-      </button>
-    </div>
+    <button onClick={handleClick} className="header-button">
+      <Trophy className="header-button-icon" />
+      Leaderboard
+    </button>
   );
 }
