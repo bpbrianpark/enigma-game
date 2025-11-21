@@ -210,7 +210,7 @@ async function checkGuess(
     }
   }
 
-  if (isDynamic) {
+  if (true) {
     const verifiedEntry = await checkAndInsertDynamic(
       aliasHashMap,
       entryByNorm,
