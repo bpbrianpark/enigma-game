@@ -38,6 +38,13 @@ export default function CategoryList({ initialCategories }: CategoryListProps) {
     return { tagMap, uncategorized };
   }, [initialCategories]);
 
+  const sortedTags = useMemo(() => {
+    const allTags = Array.from(categoriesByTag.tagMap.keys());
+    const peopleTag = allTags.find((tag) => tag.toLowerCase() === "people");
+    const otherTags = allTags.filter((tag) => tag.toLowerCase() !== "people");
+    return peopleTag ? [peopleTag, ...otherTags] : otherTags;
+  }, [categoriesByTag.tagMap]);
+
   return (
     <div className="category-page-shell">
       <aside className="category-side-rail">
@@ -70,7 +77,7 @@ export default function CategoryList({ initialCategories }: CategoryListProps) {
 
           <div className="categories-content">
             <div className="tag-cards-container">
-              {Array.from(categoriesByTag.tagMap.keys()).map((tag) => {
+              {sortedTags.map((tag) => {
                 const categories = categoriesByTag.tagMap.get(tag) || [];
                 const imageUrl = categories[0]?.imageUrl || null;
                 return (
