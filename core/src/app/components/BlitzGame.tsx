@@ -390,6 +390,8 @@ export default function BlitzGame({
                 isGameCompleted={isGameCompleted}
                 onCorrectGuess={handleCorrectGuess}
                 onIncorrectGuess={handleIncorrectGuess}
+                correctGuesses={correctGuesses}
+                incorrectGuesses={incorrectGuesses}
               />
             )}
             <div className="progress-text">

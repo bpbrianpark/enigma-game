@@ -138,3 +138,25 @@
     transform: rotate(360deg);
   }
 }
+
+.already-guessed-message {
+  color: var(--error-color);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  padding: 8px 0;
+  margin-bottom: 8px;
+  animation: fadeInOut 2s ease;
+  font-family: var(--font-main);
+}
+
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  10%, 90% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

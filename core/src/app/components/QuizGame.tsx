@@ -425,6 +425,8 @@ export default function QuizGame({
                 isGameCompleted={isGameCompleted}
                 onCorrectGuess={handleCorrectGuess}
                 onIncorrectGuess={handleIncorrectGuess}
+                correctGuesses={correctGuesses}
+                incorrectGuesses={incorrectGuesses}
               />
             )}
             <div className="progress-text">

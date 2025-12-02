@@ -83,6 +83,8 @@ export interface GuessInputProps {
   isGameCompleted: boolean;
   onCorrectGuess: (entry: EntryType) => void;
   onIncorrectGuess: (guess: string) => void;
+  correctGuesses?: EntryType[];
+  incorrectGuesses?: string[];
 }
 
 export interface LeaderboardPropsType {

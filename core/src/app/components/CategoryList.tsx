@@ -1,11 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { CategoryType } from "./types";
 import AdSlot from "./AdSlot";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import TagCard from "./TagCard";
+import InfoDialog from "./InfoDialog";
+import { CircleQuestionMark } from "lucide-react";
 import "./button.css";
 
 interface CategoryListProps {
@@ -16,6 +18,7 @@ export default function CategoryList({ initialCategories }: CategoryListProps) {
   const router = useRouter();
   const sideAdSlotId = process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR;
   const bottomAdSlotId = process.env.NEXT_PUBLIC_ADSENSE_SLOT_CATEGORIES_BOTTOM;
+  const [showInfoDialog, setShowInfoDialog] = useState(false);
 
   const categoriesByTag = useMemo(() => {
     const tagMap = new Map<string, CategoryType[]>();
@@ -72,8 +75,17 @@ export default function CategoryList({ initialCategories }: CategoryListProps) {
               >
                 Daily Challenge
               </button>
+              <button
+                className="header-button"
+                onClick={() => setShowInfoDialog(true)}
+              >
+                <CircleQuestionMark className="header-button-icon" />
+                How to Play
+              </button>
             </div>
           </div>
+
+        <AdSlot slot={bottomAdSlotId} className="bottom-banner-ad categories-top-ad" />
 
           <div className="categories-content">
             <div className="tag-cards-container">
@@ -92,11 +104,15 @@ export default function CategoryList({ initialCategories }: CategoryListProps) {
             </div>
           </div>
         </div>
-        <AdSlot slot={bottomAdSlotId} className="bottom-banner-ad" />
       </div>
       <aside className="category-side-rail">
         <AdSlot slot={sideAdSlotId} className="side-rail-ad" />
       </aside>
+      <InfoDialog
+        isOpen={showInfoDialog}
+        onClose={() => setShowInfoDialog(false)}
+        gameType="Normal"
+      />
     </div>
   );
 }

@@ -17,7 +17,7 @@ export default function QuizTable({
             <div className="guess-empty-state">No correct answers yet</div>
           ) : (
             <div className="guess-list">
-              {correctGuesses.map((guess, index) => (
+              {[...correctGuesses].reverse().map((guess, index) => (
                 <div
                   key={`correct-${guess.id}-${index}`}
                   className="guess-item correct-guess-item"
@@ -28,7 +28,7 @@ export default function QuizTable({
                     rel="noopener noreferrer"
                     className="guess-link"
                   >
-                    {index + 1}. {guess.label}
+                    {correctGuesses.length - index}. {guess.label}
                   </Link>
                 </div>
               ))}
@@ -46,12 +46,12 @@ export default function QuizTable({
             <div className="guess-empty-state">No incorrect answers yet</div>
           ) : (
             <div className="guess-list">
-              {incorrectGuesses.map((guess, index) => (
+              {[...incorrectGuesses].reverse().map((guess, index) => (
                 <div
                   key={`incorrect-${index}-${guess}`}
                   className="guess-item incorrect-guess-item"
                 >
-                  {index + 1}. {guess}
+                  {incorrectGuesses.length - index}. {guess}
                 </div>
               ))}
             </div>

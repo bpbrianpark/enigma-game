@@ -244,6 +244,8 @@ export default function GuessInput({
   isGameCompleted,
   onCorrectGuess,
   onIncorrectGuess,
+  correctGuesses = [],
+  incorrectGuesses = [],
 }: GuessInputProps) {
   const entryByNorm = useMemo(() => new Map<string, EntryType>(), []);
   const entryByUrl = useMemo(() => new Map<string, EntryType>(), []);
@@ -272,6 +274,7 @@ export default function GuessInput({
   const [inputValue, setInputValue] = useState("");
   const [showCorrectEffect, setShowCorrectEffect] = useState(false);
   const [showErrorEffect, setShowErrorEffect] = useState(false);
+  const [showAlreadyGuessed, setShowAlreadyGuessed] = useState(false);
   const [loading, setLoading] = useState(false);
   const isProcessingRef = useRef(false);
 
@@ -285,6 +288,11 @@ export default function GuessInput({
     setTimeout(() => setShowErrorEffect(false), 400);
   };
 
+  const triggerAlreadyGuessedEffect = () => {
+    setShowAlreadyGuessed(true);
+    setTimeout(() => setShowAlreadyGuessed(false), 2000);
+  };
+
   const handleSubmit = useCallback(
     async (e?: React.FormEvent) => {
       if (e) {
@@ -293,6 +301,24 @@ export default function GuessInput({
 
       if (!inputValue.trim() || loading || isProcessingRef.current) {
         return; 
+      }
+
+      const normalizedInput = normalize(transformGuess(category.slug, inputValue.trim()));
+      
+      // Check if already guessed (correct)
+      const isAlreadyCorrect = correctGuesses.some(
+        (guess) => normalize(transformGuess(category.slug, guess.label)) === normalizedInput
+      );
+      
+      // Check if already guessed (incorrect)
+      const isAlreadyIncorrect = incorrectGuesses.some(
+        (guess) => normalize(transformGuess(category.slug, guess)) === normalizedInput
+      );
+
+      if (isAlreadyCorrect || isAlreadyIncorrect) {
+        triggerAlreadyGuessedEffect();
+        setInputValue("");
+        return;
       }
 
       isProcessingRef.current = true;
@@ -350,6 +376,9 @@ export default function GuessInput({
 
   return (
     <div className="guess-input-wrapper">
+      {showAlreadyGuessed && (
+        <div className="already-guessed-message">Already guessed!</div>
+      )}
       <div className="guess-input-row">
         <div className="spinner-wrapper">
           {loading && <div className="spinner"></div>}
